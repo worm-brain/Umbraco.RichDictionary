@@ -1,0 +1,97 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Options
+@using Umbraco.Cms.Core.Services
+@using Umbraco.RichDictionary.Configuration
+@inherits UmbracoViewPage
+@inject IDictionaryItemService DictionaryItemService
+@inject ILanguageService LanguageService
+@inject IOptionsMonitor<RichDictionaryOptions> RichDictionaryOptions
+@{
+    Layout = null;
+
+    // Development page for Umbraco.RichDictionary: every dictionary item in every language,
+    // comparing Umbraco's own GetDictionaryValue with the package's GetDictionaryHtml.
+    var languages = (await LanguageService.GetAllAsync()).OrderByDescending(l => l.IsDefault).ThenBy(l => l.IsoCode).ToList();
+    var items = (await DictionaryItemService.GetDescendantsAsync(null))
+        .Where(i => i.Translations.Any(t => !string.IsNullOrEmpty(t.Value)))
+        .OrderBy(i => i.ItemKey)
+        .ToList();
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Model.Name</title>
+    <style>
+        body { font: 15px/1.5 system-ui, sans-serif; margin: 0; color: #1b264f; background: #f6f6f7; }
+        header, main, footer { max-width: 1200px; margin: 0 auto; padding: 16px; }
+        nav { display: flex; gap: 16px; background: #1b264f; padding: 12px 16px; border-radius: 6px; }
+        nav a { color: #fff; }
+        .mode { display: inline-block; padding: 2px 8px; border-radius: 4px; background: #f5c1bc; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; background: #fff; }
+        th, td { border: 1px solid #d8d7d9; padding: 8px; vertical-align: top; text-align: left; }
+        th { background: #f3f3f5; }
+        td.key { font-weight: 600; white-space: nowrap; }
+        code, pre { font: 12px/1.4 ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; margin: 0; }
+        td.rendered > :first-child { margin-top: 0; }
+        td.rendered > :last-child { margin-bottom: 0; }
+        .demo { background: #fff; border: 1px solid #d8d7d9; border-radius: 6px; padding: 16px; margin-bottom: 24px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>@Model.Name</h1>
+    <p>Editor mode: <span class="mode">@RichDictionaryOptions.CurrentValue.EditorMode</span> (<code>RichDictionary:EditorMode</code>). Current culture: <code>@CultureInfo.CurrentCulture.Name</code>.</p>
+</header>
+<main>
+    <h2>In a page</h2>
+    <div class="demo">
+        <p>Inline helper inside links and a button, block helper in the footer:</p>
+        <nav>
+            <a href="#">@Umbraco.GetDictionaryInlineHtml("Nav.Home")</a>
+            <a href="#">@Umbraco.GetDictionaryInlineHtml("Nav.About")</a>
+            <a href="#">@Umbraco.GetDictionaryInlineHtml("Nav.Contact")</a>
+        </nav>
+        <p><button type="button">@Umbraco.GetDictionaryInlineHtml("Forms.Submit")</button></p>
+        <address>@Umbraco.GetDictionaryHtml("Footer.Address")</address>
+        @Umbraco.GetDictionaryHtml("Footer.Copyright")
+    </div>
+
+    <h2>Every item, every language</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Key</th>
+            <th>Culture</th>
+            <th>Core <code>GetDictionaryValue</code> (as Razor shows it today)</th>
+            <th><code>GetDictionaryHtml</code> source</th>
+            <th><code>GetDictionaryHtml</code> rendered</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in items)
+        {
+            var first = true;
+            foreach (var language in languages)
+            {
+                var culture = new CultureInfo(language.IsoCode);
+                var html = Umbraco.GetDictionaryHtml(item.ItemKey, culture);
+                <tr>
+                    @if (first)
+                    {
+                        <td class="key" rowspan="@languages.Count">@item.ItemKey</td>
+                        first = false;
+                    }
+                    <td>@language.IsoCode</td>
+                    <td><pre>@Umbraco.GetDictionaryValue(item.ItemKey, culture)</pre></td>
+                    <td><pre>@html.ToString()</pre></td>
+                    <td class="rendered">@html</td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

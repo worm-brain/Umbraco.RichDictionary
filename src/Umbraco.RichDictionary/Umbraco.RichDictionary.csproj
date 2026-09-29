@@ -21,6 +21,8 @@
     <!-- Floor at 17.0.0 so any Umbraco 17 site can install the package; the test site pins the version we develop against. -->
     <PackageReference Include="Umbraco.Cms.Web.Website" Version="[17.0.0, 18.0.0)" />
     <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.0.0, 18.0.0)" />
+    <!-- Umbraco itself references Markdig from 17.x onwards (0.45.0 in 17.7); this floor lets NuGet unify with it rather than pin a second copy. Umbraco 17.0 used a different Markdown library. -->
+    <PackageReference Include="Markdig" Version="0.41.0" />
   </ItemGroup>
 
   <ItemGroup>
