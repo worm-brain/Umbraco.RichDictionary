@@ -1,0 +1,14 @@
+{
+  "id": "Umbraco.RichDictionary",
+  "name": "Umbraco.RichDictionary",
+  "version": "0.0.0",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "name": "Umbraco Rich Dictionary Bundle",
+      "alias": "Umbraco.RichDictionary.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoRichDictionary/umbraco-rich-dictionary.js"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Transitive packages resolve at the Umbraco 17.0.0 floor here; consuming sites resolve (and audit) their own newer versions. -->
+    <NuGetAuditMode>direct</NuGetAuditMode>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Umbraco.RichDictionary</PackageId>
+    <Product>Umbraco.RichDictionary</Product>
+    <Title>Umbraco.RichDictionary</Title>
+    <Description>Drop-in replacement for the Umbraco Translation section that edits dictionary values with a rich text (Tiptap) or Markdown editor.</Description>
+    <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Floor at 17.0.0 so any Umbraco 17 site can install the package; the test site pins the version we develop against. -->
+    <PackageReference Include="Umbraco.Cms.Web.Website" Version="[17.0.0, 18.0.0)" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" Version="[17.0.0, 18.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Lit client source is not part of the package; only its build output in wwwroot is. -->
+    <Content Remove="Client\**" />
+    <None Include="Client\public\umbraco-package.json" Pack="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.RichDictionary.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+</Project>
