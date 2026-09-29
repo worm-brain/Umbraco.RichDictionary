@@ -17,7 +17,14 @@ function hostWithAuthContext(authContext: unknown): UmbElement {
   } as unknown as UmbElement;
 }
 
-const registry = {} as UmbExtensionRegistry<UmbExtensionManifest>;
+/** A fake registry that records exclusions, the one registry call the entry point makes. */
+function createRegistry() {
+  const excluded: Array<string> = [];
+  const registry = {
+    exclude: (alias: string) => excluded.push(alias),
+  } as unknown as UmbExtensionRegistry<UmbExtensionManifest>;
+  return { registry, excluded };
+}
 
 describe("onInit", () => {
   beforeEach(() => vi.mocked(client.setConfig).mockClear());
@@ -28,14 +35,22 @@ describe("onInit", () => {
       getOpenApiConfiguration: () => ({ token, base: "https://site", credentials: "include" }),
     };
 
-    onInit(hostWithAuthContext(authContext), registry);
+    onInit(hostWithAuthContext(authContext), createRegistry().registry);
 
     expect(client.setConfig).toHaveBeenCalledWith({ auth: token, baseUrl: "https://site", credentials: "include" });
   });
 
   it("falls back to same-origin defaults when there is no auth context", () => {
-    onInit(hostWithAuthContext(undefined), registry);
+    onInit(hostWithAuthContext(undefined), createRegistry().registry);
 
     expect(client.setConfig).toHaveBeenCalledWith({ auth: undefined, baseUrl: "", credentials: "same-origin" });
+  });
+
+  it("excludes the core dictionary edit view it replaces", () => {
+    const { registry, excluded } = createRegistry();
+
+    onInit(hostWithAuthContext(undefined), registry);
+
+    expect(excluded).toEqual(["Umb.WorkspaceView.Dictionary.Edit"]);
   });
 });

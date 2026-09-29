@@ -1,14 +1,20 @@
 import type { UmbEntryPointOnInit, UmbEntryPointOnUnload } from "@umbraco-cms/backoffice/extension-api";
 import { UMB_AUTH_CONTEXT } from "@umbraco-cms/backoffice/auth";
 import { client } from "../api/client.gen.js";
+import { CORE_DICTIONARY_EDIT_VIEW_ALIAS } from "../dictionary-editor/constants.js";
 
 /**
- * Back-office entry point. Points the generated Management API client at the current Umbraco
- * instance and authenticates it as the logged-in back-office user.
+ * Back-office entry point. Hides the core dictionary edit view that the package replaces, then
+ * points the generated Management API client at the current Umbraco instance and authenticates it
+ * as the logged-in back-office user.
  *
  * @param host - The host element the entry point is attached to, used to consume contexts.
+ * @param extensionRegistry - The back-office extension registry.
  */
-export const onInit: UmbEntryPointOnInit = (host) => {
+export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
+  // Unregisters the core view if it's already registered, and blocks it if it registers later.
+  extensionRegistry.exclude(CORE_DICTIONARY_EDIT_VIEW_ALIAS);
+
   host.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
     const config = authContext?.getOpenApiConfiguration();
 
