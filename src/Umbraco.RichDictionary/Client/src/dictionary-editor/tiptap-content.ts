@@ -14,13 +14,23 @@ const HTML_MARKUP = /<\/?[a-z][a-z0-9-]*(\s[^<>]*)?\/?>|&(#\d+|#x[0-9a-f]+|[a-z]
  * @returns HTML for the editor's initial content.
  */
 export function toTiptapContent(value: string): string {
-  if (!value || HTML_MARKUP.test(value)) return value;
+  if (!value || containsHtmlMarkup(value)) return value;
 
   return value
     .replace(/\r\n?/g, "\n")
     .split(/\n{2,}/)
     .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
     .join("");
+}
+
+/**
+ * Whether a stored value holds HTML markup (a tag or a character reference) rather than plain text.
+ * This is the rule `toTiptapContent` uses to decide between passing a value through and escaping it.
+ *
+ * @param value - The stored translation.
+ */
+export function containsHtmlMarkup(value: string): boolean {
+  return HTML_MARKUP.test(value);
 }
 
 function escapeHtml(text: string): string {

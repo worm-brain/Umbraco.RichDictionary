@@ -26,6 +26,9 @@
     <ProjectReference Include="..\Umbraco.RichDictionary\Umbraco.RichDictionary.csproj" />
   </ItemGroup>
 
+  <!-- A project reference gets none of the package's buildTransitive files, so import the one that adds its appsettings schema. -->
+  <Import Project="..\Umbraco.RichDictionary\buildTransitive\Umbraco.RichDictionary.targets" />
+
   <PropertyGroup>
     <!-- Razor files are needed for the backoffice to work correctly -->
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>

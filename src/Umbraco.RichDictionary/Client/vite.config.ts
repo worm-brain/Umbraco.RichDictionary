@@ -1,7 +1,10 @@
 /// <reference types="vitest/config" />
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
+import { umbracoPackageVersion } from "./scripts/umbraco-package-version.js";
 
 export default defineConfig({
+  plugins: [umbracoPackageVersion(fileURLToPath(new URL("../Umbraco.RichDictionary.csproj", import.meta.url)))],
   build: {
     lib: {
       // The bundle entry registers every manifest the package provides.
@@ -20,6 +23,8 @@ export default defineConfig({
   },
   test: {
     environment: "happy-dom",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
+    // Component tests need a real browser; vitest.browser.config.ts runs them.
+    exclude: ["src/**/*.browser.test.ts"],
   },
 });

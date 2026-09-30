@@ -1,0 +1,14 @@
+<Project>
+  <!--
+    Umbraco's build (Umbraco.Cms.Targets) copies each UmbracoJsonSchemaFiles item into the site and references it from
+    appsettings-schema.json, so RichDictionary settings get IntelliSense and validation. Umbraco only ever adds these
+    references: after the package is removed, the copied file and its reference stay until someone deletes them.
+    This is a .targets file because the static web assets SDK generates this package's buildTransitive .props.
+  -->
+  <ItemGroup>
+    <UmbracoJsonSchemaFiles
+      Include="$(MSBuildThisFileDirectory)..\appsettings-schema.Umbraco.RichDictionary.json"
+      Weight="-40"
+    />
+  </ItemGroup>
+</Project>
