@@ -1,4 +1,4 @@
-# Umbraco.RichDictionary
+# Umbraco.Community.RichDictionary
 
 Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor instead of a plain textarea.
 
@@ -11,7 +11,7 @@ The **Translation** section stays exactly as Umbraco ships it: the tree, create,
 ## Install
 
 ```sh
-dotnet add package Umbraco.RichDictionary
+dotnet add package Umbraco.Community.RichDictionary
 ```
 
 Restart the site. No configuration is needed: dictionary items now open in the rich text editor, and existing plain-text values show up in it as paragraphs.

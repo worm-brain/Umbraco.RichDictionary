@@ -1,0 +1,46 @@
+# Builds and tests the package (C# and the Lit client) on every pull request and push to main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: oven-sh/setup-bun@v2
+
+      # C#: format, build, test.
+      - run: dotnet tool restore
+      - run: dotnet csharpier check .
+      - run: dotnet build Umbraco.RichDictionary.slnx
+      - run: dotnet test Umbraco.RichDictionary.slnx --no-build
+
+      # Client: format, typecheck, unit tests, then the component tests in Chromium.
+      - name: Client checks
+        working-directory: src/Umbraco.RichDictionary/Client
+        run: |
+          bun install --frozen-lockfile
+          bun run format:check
+          bun run typecheck
+          bun run test
+          bunx playwright install --with-deps chromium
+          bun run test:browser
+
+      # Packing builds the client itself; this proves a clean checkout produces a complete package.
+      - run: dotnet pack src/Umbraco.RichDictionary -o artifacts
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/
