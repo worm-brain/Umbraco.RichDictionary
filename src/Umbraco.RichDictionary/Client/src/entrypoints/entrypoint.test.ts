@@ -17,13 +17,24 @@ function hostWithAuthContext(authContext: unknown): UmbElement {
   } as unknown as UmbElement;
 }
 
-/** A fake registry that records exclusions, the one registry call the entry point makes. */
+/**
+ * A fake registry holding manifests by alias, with the core dictionary detail repository already
+ * registered, and recording exclusions.
+ */
 function createRegistry() {
   const excluded: Array<string> = [];
+  const registered = new Map<string, UmbExtensionManifest>([
+    [
+      "Umb.Repository.Dictionary.Detail",
+      { type: "repository", alias: "Umb.Repository.Dictionary.Detail", name: "Dictionary Detail Repository" },
+    ],
+  ]);
   const registry = {
     exclude: (alias: string) => excluded.push(alias),
+    unregister: (alias: string) => registered.delete(alias),
+    register: (manifest: UmbExtensionManifest) => registered.set(manifest.alias, manifest),
   } as unknown as UmbExtensionRegistry<UmbExtensionManifest>;
-  return { registry, excluded };
+  return { registry, excluded, registered };
 }
 
 describe("onInit", () => {
@@ -52,5 +63,13 @@ describe("onInit", () => {
     onInit(hostWithAuthContext(undefined), registry);
 
     expect(excluded).toEqual(["Umb.WorkspaceView.Dictionary.Edit"]);
+  });
+
+  it("replaces the core dictionary detail repository with ours under the same alias", () => {
+    const { registry, registered } = createRegistry();
+
+    onInit(hostWithAuthContext(undefined), registry);
+
+    expect(registered.get("Umb.Repository.Dictionary.Detail")?.name).toBe("Rich Dictionary Detail Repository");
   });
 });
