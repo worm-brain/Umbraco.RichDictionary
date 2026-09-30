@@ -21,5 +21,7 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     include: ["src/**/*.test.ts"],
+    // Component tests need a real browser; vitest.browser.config.ts runs them.
+    exclude: ["src/**/*.browser.test.ts"],
   },
 });

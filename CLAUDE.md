@@ -25,6 +25,7 @@ bun install
 bun run build          # tsc + vite -> ../wwwroot/App_Plugins/UmbracoRichDictionary (gitignored build output)
 bun run watch          # vite rebuild on change; the running test site serves the new files
 bun run test           # vitest (happy-dom); single file: bun run test src/entrypoints/entrypoint.test.ts
+bun run test:browser   # component tests (*.browser.test.ts) in Playwright Chromium; first time: bunx playwright install chromium
 bun run typecheck
 bun run format         # prettier; format:check in CI
 bun run generate-client  # regenerates src/api from the RUNNING test site's Swagger doc
@@ -65,7 +66,7 @@ Umbraco.RichDictionary is an **Umbraco 17** backoffice extension, shipped as a C
 Things to settle as you build; record decisions here or as ADRs:
 
 - **Hiding the core view:** the entry point calls `extensionRegistry.exclude("Umb.WorkspaceView.Dictionary.Edit")`. Don't use CSS or permission hacks. If an Umbraco upgrade renames that alias, both views will render, so `dictionary-editor/constants.test.ts` fails when the installed `@umbraco-cms/backoffice` stops registering it; update `CORE_DICTIONARY_EDIT_VIEW_ALIAS` in `constants.ts` then.
-- **No phantom edits:** opening an item must not dirty the workspace, or Umbraco prompts "discard changes?" on navigation. Tiptap receives legacy values as its initial `content` (no update event), and `translation-input` only dispatches `change` on user edits. See that file for the empty-editor (`<p></p>` vs `""`) loop guard.
+- **No phantom edits:** opening an item must not dirty the workspace, or Umbraco prompts "discard changes?" on navigation. Tiptap receives legacy values as its initial `content` (no update event), and `translation-input` only dispatches `change` on user edits. See that file for the empty-editor (`<p></p>` vs `""`) loop guard. The component tests (`*.browser.test.ts`) cover both against the real core Tiptap editor.
 - **Management API JSON:** our base controller must carry `[JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]`. Without it, enums serialise as numbers while Swagger (and so `src/api`) promises strings.
 - **Plain-text legacy values: one rule, implemented twice.** `dictionary-editor/tiptap-content.ts` (client) and `DictionaryHtmlConverter` (server) must agree, so a value renders the same in the editor and on the site. A value containing HTML markup (a tag or a character reference) passes through. Anything else is text: escape only `& < >`, turn blank lines into paragraphs and newlines into `<br>`. Their test cases mirror each other; change both together. In Markdown mode the editor shows values raw, and the server renders a single newline as `<br>`.
 - **Sanitising (decided):** output is not sanitised by the package itself. It goes through Umbraco's `IHtmlSanitizer`, matching how Umbraco treats rich text written by back-office users.
