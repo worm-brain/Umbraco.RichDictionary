@@ -4,6 +4,8 @@ import { UMB_DICTIONARY_WORKSPACE_CONTEXT } from "@umbraco-cms/backoffice/dictio
 import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from "@umbraco-cms/backoffice/language";
 import { UMB_CURRENT_USER_CONTEXT } from "@umbraco-cms/backoffice/current-user";
 import { getEditorMode } from "../configuration/editor-mode.js";
+import { canEditLanguage } from "./language-access.js";
+import { requestAllLanguages } from "./languages.js";
 import type { RichDictionaryTranslationInputElement, TranslationInputMode } from "./translation-input.element.js";
 import "./translation-input.element.js";
 
@@ -61,16 +63,19 @@ export class RichDictionaryWorkspaceViewElement extends UmbLitElement {
     });
   }
 
+  /** Loads every language on the site, once, to render a field for each. */
   override async firstUpdated() {
-    const { data } = await this.#languageCollectionRepository.requestAllItems();
-    if (data) this._languages = data.items;
+    const languages = await requestAllLanguages(this.#languageCollectionRepository);
+    if (languages) this._languages = languages;
   }
 
   // Read-only until the current user has loaded, then only for languages the user can't access.
   #isReadOnly(isoCode: string) {
     if (!this._hasCurrentUser) return true;
-    if (this._currentUserHasAccessToAllLanguages) return false;
-    return !this._currentUserLanguageAccess?.includes(isoCode);
+    return !canEditLanguage(isoCode, {
+      hasAccessToAllLanguages: this._currentUserHasAccessToAllLanguages,
+      languages: this._currentUserLanguageAccess ?? [],
+    });
   }
 
   #onChange(isoCode: string, event: Event) {

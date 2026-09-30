@@ -6,9 +6,17 @@ export type ClientOptions = {
 
 export type ConfigurationResponseModel = {
     editorMode: EditorMode;
+    richTextDataType?: string | null;
+    richTextEditor?: RichTextEditorResponseModel | null;
 };
 
 export type EditorMode = 'Rte' | 'Markdown';
+
+export type RichTextEditorResponseModel = {
+    dataTypeId: string;
+    extensions: Array<string>;
+    toolbar: Array<Array<Array<string>>>;
+};
 
 export type GetConfigurationData = {
     body?: never;

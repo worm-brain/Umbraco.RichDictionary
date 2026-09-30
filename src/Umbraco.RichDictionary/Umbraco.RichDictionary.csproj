@@ -15,7 +15,34 @@
     <Title>Umbraco.RichDictionary</Title>
     <Description>Drop-in replacement for the Umbraco Translation section that edits dictionary values with a rich text (Tiptap) or Markdown editor.</Description>
     <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
+    <!-- The one place the version is defined: the client build stamps it into umbraco-package.json (see Client/scripts/umbraco-package-version.ts). -->
+    <Version>1.0.0-beta.1</Version>
+    <Authors>Jack Stunell</Authors>
+    <Copyright>Copyright (c) 2026 Jack Stunell</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/worm-brain/Umbraco.RichDictionary</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/worm-brain/Umbraco.RichDictionary.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The appsettings schema, added to the site's appsettings-schema.json by buildTransitive/Umbraco.RichDictionary.targets. -->
+    <Content Remove="appsettings-schema.Umbraco.RichDictionary.json" />
+    <None Remove="appsettings-schema.Umbraco.RichDictionary.json" />
+    <None Include="appsettings-schema.Umbraco.RichDictionary.json" Pack="true" PackagePath="\" />
+    <None
+      Update="buildTransitive\Umbraco.RichDictionary.targets"
+      Pack="true"
+      PackagePath="buildTransitive\Umbraco.RichDictionary.targets"
+    />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Floor at 17.0.0 so any Umbraco 17 site can install the package; the test site pins the version we develop against. -->
@@ -34,6 +61,68 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Umbraco.RichDictionary.Tests" />
   </ItemGroup>
+
+  <!--
+    The client's build output is gitignored, so packing has to build it. This happens on `dotnet pack` only
+    (the CLI sets _IsPacking), so C#-only work never needs Bun. Pass -p:BuildClient=true to build it on an
+    ordinary `dotnet build` too.
+  -->
+  <PropertyGroup>
+    <BuildClient Condition="'$(BuildClient)' == ''">$(_IsPacking)</BuildClient>
+    <ClientDirectory>$(MSBuildProjectDirectory)\Client\</ClientDirectory>
+    <ClientOutputDirectory>wwwroot\App_Plugins\UmbracoRichDictionary\</ClientOutputDirectory>
+  </PropertyGroup>
+
+  <!--
+    Runs before static web assets are resolved. They are discovered from @(Content), whose wwwroot glob was
+    evaluated before this target wrote the files, so the client output is re-globbed afterwards: without that,
+    a pack from a clean checkout ships no client, and a rebuild with new chunk hashes points at deleted files.
+    The NoBuild check is needed because a BeforeTargets hook still runs when its target is skipped.
+  -->
+  <Target
+    Name="BuildClient"
+    BeforeTargets="ResolveProjectStaticWebAssets"
+    Condition="'$(BuildClient)' == 'true' and '$(NoBuild)' != 'true'"
+  >
+    <Exec
+      Command="bun --version"
+      IgnoreExitCode="true"
+      EchoOff="true"
+      StandardOutputImportance="low"
+      StandardErrorImportance="low"
+    >
+      <Output TaskParameter="ExitCode" PropertyName="_BunExitCode" />
+    </Exec>
+    <Error
+      Condition="'$(_BunExitCode)' != '0'"
+      Text="Bun is required to build the Umbraco.RichDictionary back-office client, but 'bun' was not found on PATH. Install it from https://bun.sh and try again."
+    />
+
+    <Exec
+      Command="bun install --frozen-lockfile"
+      WorkingDirectory="$(ClientDirectory)"
+      Condition="Exists('$(ClientDirectory)bun.lock')"
+    />
+    <!-- Passes the version on so a -p:Version override reaches umbraco-package.json too. -->
+    <Exec
+      Command="bun run build"
+      WorkingDirectory="$(ClientDirectory)"
+      EnvironmentVariables="RICH_DICTIONARY_VERSION=$(PackageVersion)"
+    />
+
+    <ItemGroup>
+      <Content Remove="$(ClientOutputDirectory)**" />
+      <Content Include="$(ClientOutputDirectory)**" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Catches packs that skip BuildClient (a no-build `dotnet pack`, or `msbuild -t:Pack`) on a checkout with no client build. -->
+  <Target Name="EnsureClientBuilt" BeforeTargets="GenerateNuspec">
+    <Error
+      Condition="!Exists('$(ClientOutputDirectory)umbraco-rich-dictionary.js')"
+      Text="The back-office client has not been built, so the package would ship without it. Pack with `dotnet pack` (which builds it), or run `bun run build` in src/Umbraco.RichDictionary/Client first."
+    />
+  </Target>
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
