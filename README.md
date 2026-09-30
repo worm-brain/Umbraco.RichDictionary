@@ -4,6 +4,16 @@ Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor inst
 
 The **Translation** section stays exactly as Umbraco ships it: the tree, create, move, delete, import, export, search and permissions are all core. The package only replaces the plain textareas on a dictionary item's edit screen. Values stay in Umbraco's own dictionary storage as plain strings, so there are no migrations or custom tables, and your existing `GetDictionaryValue` calls keep working.
 
+## Screenshots
+
+**`Rte` mode** (the default): each language gets Umbraco's own Tiptap rich text editor.
+
+![A dictionary item in Rte mode, with a Tiptap rich text editor for each language](https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/editor-rte.png)
+
+**`Markdown` mode**: each language gets Umbraco's Markdown editor.
+
+![A dictionary item in Markdown mode, with a Markdown editor for each language](https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/editor-markdown.png)
+
 ## Requirements
 
 - Umbraco 17.x (.NET 10). Tested on fresh 17.0.0 and 17.7.0 sites.
