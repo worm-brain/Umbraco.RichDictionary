@@ -6,7 +6,7 @@ The **Translation** section stays exactly as Umbraco ships it: the tree, create,
 
 ## Requirements
 
-- Umbraco 17.x (.NET 10). Developed and tested against 17.7. The package allows any 17.x version; support back to 17.0 is still being verified.
+- Umbraco 17.x (.NET 10). Tested on fresh 17.0.0 and 17.7.0 sites.
 
 ## Install
 
@@ -126,6 +126,7 @@ public class FooterViewComponent(
 **`Rte` mode**
 
 - A value that already contains HTML markup (a tag such as `<p>`, or a character reference such as `&copy;`) is output as stored.
+  Plain text that happens to contain something tag-like, such as `<leave>`, counts as HTML too: the editor drops a tag it doesn't know (so saving that field loses it), and the site outputs it as a raw element.
 - Anything else is treated as plain text, such as values saved before the package was installed. `&`, `<` and `>` are escaped, blank lines become paragraphs, and single line breaks become `<br>`. The editor shows the value the same way, so it looks the same in the back-office and on the site.
 
 **`Markdown` mode**
@@ -167,7 +168,8 @@ A missing translation renders as empty, and no language fallback is applied. Thi
 Remove the package and restart. The stock Translation editor comes back, and there is nothing in the database to clean up. Afterwards:
 
 - Values edited while the package was installed keep their HTML or Markdown markup. The stock textarea shows that markup as text.
-- Views that call `GetDictionaryHtml`, `GetDictionaryInlineHtml`, `GetHtml` or `GetInlineHtml`, or inject `IDictionaryHtmlConverter`, stop compiling. Switch them back to `GetDictionaryValue`.
+- Views that call `GetDictionaryHtml`, `GetDictionaryInlineHtml`, `GetHtml` or `GetInlineHtml`, or inject `IDictionaryHtmlConverter`, stop compiling. With runtime Razor compilation (the development default) that shows up when the page is requested, not at build time. Switch them back to `GetDictionaryValue`.
+- With central package management, `dotnet remove package` leaves the `PackageVersion` entry in `Directory.Packages.props`. It's harmless; delete it by hand.
 - A leftover `RichDictionary` section in `appsettings.json` is ignored. Delete it when convenient.
 - Umbraco does not remove the copied `appsettings-schema.Umbraco.RichDictionary.json` from your site, or its `$ref` in `appsettings-schema.json`. Delete both by hand.
 
