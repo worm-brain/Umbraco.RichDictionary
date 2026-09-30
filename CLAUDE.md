@@ -30,7 +30,7 @@ bun run format         # prettier; format:check in CI
 bun run generate-client  # regenerates src/api from the RUNNING test site's Swagger doc
 ```
 
-- Run `bun run build` before `dotnet pack`. The package serves the client from `wwwroot`, and nothing in MSBuild builds it for you.
+- `dotnet pack` builds the client itself (`bun install --frozen-lockfile` + `bun run build`, via the `BuildClient` target in the package `.csproj`), so Bun must be on PATH to pack. An ordinary `dotnet build` does not touch the client; pass `-p:BuildClient=true` to make it. A no-build pack fails if the client output is missing rather than shipping without it.
 - The test site discovers static web asset *folders* only when it starts. If `wwwroot/App_Plugins/UmbracoRichDictionary` didn't exist when the site started (e.g. a fresh clone), restart it after the first client build. After that, new or rehashed chunks are served straight away. C# changes always need a restart.
 - `src/api` is generated code and is committed, so the client builds without a running site. Regenerate it after any change to a controller or response model; never hand-edit it.
 
