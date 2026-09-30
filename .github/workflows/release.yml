@@ -1,0 +1,54 @@
+# Publishes the package to nuget.org when a version tag (v1.2.3, v1.0.0-beta.1) is pushed.
+#
+# Uses NuGet trusted publishing, so no API key is stored: the job exchanges its GitHub OIDC token for a
+# short-lived key. One-off setup on nuget.org: add a trusted publishing policy for this repository and the
+# workflow file release.yml, then set the repository variable NUGET_USER to your nuget.org user name.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write # needed to request the OIDC token for trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: nuget
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: oven-sh/setup-bun@v2
+
+      # The version lives once, in the package csproj; refuse to publish a tag that disagrees with it.
+      - name: Check the tag matches the package version
+        run: |
+          version=$(dotnet msbuild src/Umbraco.RichDictionary -getProperty:Version)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match <Version>$version</Version> in the package csproj."
+            exit 1
+          fi
+
+      - run: dotnet test Umbraco.RichDictionary.slnx
+
+      # Builds the client too, and produces the .nupkg and its .snupkg symbol package.
+      - run: dotnet pack src/Umbraco.RichDictionary -o artifacts
+
+      - uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      # Pushing the .nupkg also pushes the matching .snupkg from the same folder.
+      - run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/
