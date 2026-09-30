@@ -488,6 +488,9 @@ src/Umbraco.RichDictionary.TestSite/wwwroot/media/
 ## Lit client: dependencies and build output (rebuilt by `bun run build` in Client/)
 node_modules/
 src/Umbraco.RichDictionary/wwwroot/App_Plugins/
+# Screenshots and attachments Vitest browser mode saves when a component test fails
+__screenshots__/
+.vitest-attachments/
 
 ## JSON schemas Umbraco regenerates on every build of the test site
 src/Umbraco.RichDictionary.TestSite/appsettings-schema*.json
