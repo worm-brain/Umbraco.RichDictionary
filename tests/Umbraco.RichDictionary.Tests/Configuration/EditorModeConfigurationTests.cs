@@ -1,9 +1,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.RichDictionary.Configuration;
 using Umbraco.RichDictionary.DictionaryHtml;
 
@@ -37,14 +39,27 @@ public class EditorModeConfigurationTests
             .GetRequiredService<IOptionsMonitor<RichDictionaryOptions>>();
     }
 
+    /// <summary>
+    /// A controller over the given options. No rich text data type is configured in these tests, so the data type
+    /// service is never called.
+    /// </summary>
+    private static ConfigurationController CreateController(
+        IOptionsMonitor<RichDictionaryOptions> options
+    ) =>
+        new(
+            options,
+            Substitute.For<IDataTypeService>(),
+            NullLogger<ConfigurationController>.Instance
+        );
+
     [Fact]
-    public void GetConfiguration_WithNoRichDictionarySection_ReturnsRte()
+    public async Task GetConfiguration_WithNoRichDictionarySection_ReturnsRte()
     {
         // Arrange
-        var controller = new ConfigurationController(BindOptions(editorMode: null));
+        var controller = CreateController(BindOptions(editorMode: null));
 
         // Act
-        var result = controller.GetConfiguration();
+        var result = await controller.GetConfiguration();
 
         // Assert
         Assert.Equal(EditorMode.Rte, result.EditorMode);
@@ -54,13 +69,13 @@ public class EditorModeConfigurationTests
     [InlineData("Markdown")]
     [InlineData("markdown")]
     [InlineData(" MARKDOWN ")]
-    public void GetConfiguration_WithMarkdownInAnyCase_ReturnsMarkdown(string configured)
+    public async Task GetConfiguration_WithMarkdownInAnyCase_ReturnsMarkdown(string configured)
     {
         // Arrange
-        var controller = new ConfigurationController(BindOptions(configured));
+        var controller = CreateController(BindOptions(configured));
 
         // Act
-        var result = controller.GetConfiguration();
+        var result = await controller.GetConfiguration();
 
         // Assert
         Assert.Equal(EditorMode.Markdown, result.EditorMode);
@@ -70,13 +85,13 @@ public class EditorModeConfigurationTests
     [InlineData("Nonsense")]
     [InlineData("")]
     [InlineData("1")]
-    public void GetConfiguration_WithUnrecognisedValue_FallsBackToRte(string configured)
+    public async Task GetConfiguration_WithUnrecognisedValue_FallsBackToRte(string configured)
     {
         // Arrange
-        var controller = new ConfigurationController(BindOptions(configured));
+        var controller = CreateController(BindOptions(configured));
 
         // Act
-        var result = controller.GetConfiguration();
+        var result = await controller.GetConfiguration();
 
         // Assert
         Assert.Equal(EditorMode.Rte, result.EditorMode);
