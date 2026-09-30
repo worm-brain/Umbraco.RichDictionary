@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toTiptapContent } from "./tiptap-content.js";
+import { containsHtmlMarkup, toTiptapContent } from "./tiptap-content.js";
 
 describe("toTiptapContent", () => {
   it.each([
@@ -42,5 +42,15 @@ describe("toTiptapContent", () => {
 
   it("keeps Markdown syntax as literal text", () => {
     expect(toTiptapContent("**Welcome** to the _blog_")).toBe("<p>**Welcome** to the _blog_</p>");
+  });
+});
+
+describe("containsHtmlMarkup", () => {
+  it("is true for a value with a tag", () => {
+    expect(containsHtmlMarkup("<p>Hello</p>")).toBe(true);
+  });
+
+  it("is false for plain text with a bare < and &", () => {
+    expect(containsHtmlMarkup("Prices < £10 & up")).toBe(false);
   });
 });

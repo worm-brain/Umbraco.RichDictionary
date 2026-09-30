@@ -1,10 +1,14 @@
-import { css, customElement, html, property } from "@umbraco-cms/backoffice/external/lit";
+import { css, customElement, html, nothing, property, state } from "@umbraco-cms/backoffice/external/lit";
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 import { UmbChangeEvent } from "@umbraco-cms/backoffice/event";
+import { umbExtensionsRegistry } from "@umbraco-cms/backoffice/extension-registry";
 import { UmbPropertyEditorConfigCollection } from "@umbraco-cms/backoffice/property-editor";
 import type { UmbInputTiptapElement } from "@umbraco-cms/backoffice/tiptap";
 import type { EditorMode } from "../api/index.js";
+import { getConfiguration } from "../configuration/editor-mode.js";
+import { detectForeignFormat } from "./format-mismatch.js";
 import { toTiptapContent } from "./tiptap-content.js";
+import { resolveTiptapConfiguration } from "./tiptap-toolbar.js";
 
 /**
  * Which editor a translation renders with. `Plain` is the stock textarea, used when the configured
@@ -12,43 +16,28 @@ import { toTiptapContent } from "./tiptap-content.js";
  */
 export type TranslationInputMode = EditorMode | "Plain";
 
-// Dictionary values are short, inline copy, so the toolbar offers text formatting and links but
-// none of the media, block, table or heading tools of the default Tiptap data type.
-const RTE_CONFIGURATION = new UmbPropertyEditorConfigCollection([
-  {
-    alias: "extensions",
-    value: [
-      "Umb.Tiptap.Bold",
-      "Umb.Tiptap.Italic",
-      "Umb.Tiptap.Underline",
-      "Umb.Tiptap.Strike",
-      "Umb.Tiptap.Subscript",
-      "Umb.Tiptap.Superscript",
-      "Umb.Tiptap.BulletList",
-      "Umb.Tiptap.OrderedList",
-      "Umb.Tiptap.Link",
-    ],
-  },
-  {
-    alias: "toolbar",
-    value: [
-      [
-        ["Umb.Tiptap.Toolbar.SourceEditor"],
-        [
-          "Umb.Tiptap.Toolbar.Bold",
-          "Umb.Tiptap.Toolbar.Italic",
-          "Umb.Tiptap.Toolbar.Underline",
-          "Umb.Tiptap.Toolbar.Strike",
-        ],
-        ["Umb.Tiptap.Toolbar.Subscript", "Umb.Tiptap.Toolbar.Superscript"],
-        ["Umb.Tiptap.Toolbar.BulletList", "Umb.Tiptap.Toolbar.OrderedList"],
-        ["Umb.Tiptap.Toolbar.Link", "Umb.Tiptap.Toolbar.Unlink"],
-        ["Umb.Tiptap.Toolbar.ClearFormatting"],
-        ["Umb.Tiptap.Toolbar.Undo", "Umb.Tiptap.Toolbar.Redo"],
-      ],
-    ],
-  },
-]);
+let rteConfiguration: Promise<UmbPropertyEditorConfigCollection> | undefined;
+
+// The Tiptap toolbar and extensions: the site's configured rich text data type, filtered for
+// dictionary values, or the package default (see tiptap-toolbar.ts). Resolved once per session, so
+// the warnings are logged once rather than once per language.
+function getRteConfiguration(): Promise<UmbPropertyEditorConfigCollection> {
+  rteConfiguration ??= getConfiguration().then((configuration) => {
+    // Retry next time if the request failed; the workspace falls back to Plain mode anyway.
+    if (!configuration) rteConfiguration = undefined;
+
+    const { extensions, toolbar } = resolveTiptapConfiguration(
+      configuration,
+      (alias, type) => umbExtensionsRegistry.getByAlias(alias)?.type === type,
+      (message) => console.warn(`[Umbraco.RichDictionary] ${message}`),
+    );
+    return new UmbPropertyEditorConfigCollection([
+      { alias: "extensions", value: extensions },
+      { alias: "toolbar", value: toolbar },
+    ]);
+  });
+  return rteConfiguration;
+}
 
 /**
  * Edits one language's translation with the configured editor. Dispatches `UmbChangeEvent` on
@@ -76,10 +65,18 @@ export class RichDictionaryTranslationInputElement extends UmbLitElement {
   // So while `value` still equals what this element last emitted, Tiptap keeps its own HTML.
   #emitted?: { stored: string; editorHtml: string };
 
+  // Tiptap reads its configuration when it first renders, so it waits for this rather than
+  // starting with the default toolbar and switching.
+  @state()
+  private _rteConfiguration?: UmbPropertyEditorConfigCollection;
+
   protected override willUpdate(changed: Map<PropertyKey, unknown>) {
     if (changed.has("mode")) {
       // Lazy-load only the editor in use; both modules are core back-office code served by Umbraco.
-      if (this.mode === "Rte") import("@umbraco-cms/backoffice/tiptap");
+      if (this.mode === "Rte") {
+        import("@umbraco-cms/backoffice/tiptap");
+        getRteConfiguration().then((configuration) => (this._rteConfiguration = configuration));
+      }
       if (this.mode === "Markdown") import("@umbraco-cms/backoffice/markdown-editor");
     }
   }
@@ -104,10 +101,29 @@ export class RichDictionaryTranslationInputElement extends UmbLitElement {
   }
 
   override render() {
+    return html`${this.#renderEditor()}${this.#renderForeignFormatNotice()}`;
+  }
+
+  // Informational only: the notice never touches the stored value, and converting it is left to the editor.
+  #renderForeignFormatNotice() {
+    const format = detectForeignFormat(this.value, this.mode);
+    if (!format) return nothing;
+
+    const message =
+      format === "Markdown"
+        ? "This value looks like Markdown, so the rich text editor shows its syntax as plain text. Check it before saving."
+        : "This value looks like HTML from the rich text editor, so the Markdown editor shows its tags as text. Check it before saving.";
+    return html`<p class="foreign-format" role="status">
+      <uui-icon name="icon-alert"></uui-icon><span>${message}</span>
+    </p>`;
+  }
+
+  #renderEditor() {
     switch (this.mode) {
       case "Rte":
+        if (!this._rteConfiguration) return html`<uui-loader></uui-loader>`;
         return html`<umb-input-tiptap
-          .configuration=${RTE_CONFIGURATION}
+          .configuration=${this._rteConfiguration}
           .value=${this.#tiptapValue()}
           .label=${this.label}
           ?readonly=${this.readonly}
@@ -133,6 +149,15 @@ export class RichDictionaryTranslationInputElement extends UmbLitElement {
     css`
       :host {
         display: block;
+      }
+
+      .foreign-format {
+        display: flex;
+        align-items: center;
+        gap: var(--uui-size-space-2);
+        margin: var(--uui-size-space-2) 0 0;
+        color: var(--uui-color-warning-standalone);
+        font-size: var(--uui-type-small-size);
       }
     `,
   ];
