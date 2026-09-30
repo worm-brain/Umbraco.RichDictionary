@@ -1,8 +1,12 @@
+using System.ComponentModel;
+
 namespace Umbraco.RichDictionary.Configuration;
 
 /// <summary>
-/// Which editor the Rich Dictionary section uses for dictionary values.
+/// Which editor the Rich Dictionary section uses for dictionary values. An unrecognised configured value binds as
+/// <see cref="Rte"/>, with a warning logged at startup.
 /// </summary>
+[TypeConverter(typeof(EditorModeConverter))]
 public enum EditorMode
 {
     /// <summary>Tiptap rich text editor; values are stored as HTML.</summary>
