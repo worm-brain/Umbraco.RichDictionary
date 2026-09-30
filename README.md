@@ -19,6 +19,23 @@ A drop-in replacement for the Umbraco 17 **Translation** section that edits dict
 
 `EditorMode` is `Rte` (Tiptap, stores HTML; the default) or `Markdown` (stores Markdown).
 
+### Rich text toolbar
+
+In `Rte` mode the editor has a built-in toolbar for short copy: bold, italic, underline, strike, sub/superscript, lists, links, clear formatting, undo/redo and source view. To choose your own, create a rich text data type in **Settings > Data Types**, design its toolbar there, and point the package at it by key or by name:
+
+```json
+{
+  "RichDictionary": {
+    "EditorMode": "Rte",
+    "RichTextDataType": "Dictionary Rich Text"
+  }
+}
+```
+
+The dictionary editor then uses that data type's Tiptap extensions and toolbar. Its other settings (stylesheets, dimensions, blocks, media) are not used. Media, blocks and embeds don't belong in dictionary values, so these are always removed: the `Umb.Tiptap.Image`, `Umb.Tiptap.MediaUpload`, `Umb.Tiptap.Figure`, `Umb.Tiptap.Embed` and `Umb.Tiptap.Block` extensions, and the Media picker, Embedded media and Block picker toolbar buttons.
+
+If the setting doesn't match a rich text data type, the server logs a warning and the built-in toolbar is used. Unknown toolbar items or extensions are skipped with a warning in the browser console. If no buttons are left, the built-in toolbar is used.
+
 ## Development
 
 Requires the .NET 10 SDK and [Bun](https://bun.sh).
