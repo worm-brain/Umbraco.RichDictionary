@@ -50,6 +50,8 @@ Package version: defined once, as `<Version>` in `Umbraco.RichDictionary.csproj`
 
 Version policy: the package references Umbraco as `[17.0.0, 18.0.0)` so that any 17.x site can install it. The test site and tests pin the version we develop against. `NuGetAuditMode=direct` on the package project stops the transitive packages resolved at the 17.0.0 floor from producing audit noise.
 
+17.0 floor (decided, #2): verified by installing the `.nupkg` on fresh 17.0.0 and 17.7.0 sites; the floor stays at 17.0.0. Every Tiptap extension and toolbar alias in the built-in toolbar is registered on 17.0. The client is compiled against the 17.7 back-office, though, so it must only call APIs that 17.0 has too: `UmbLanguageCollectionRepository.requestAllItems` (and core `fetchAllPages`) arrived after 17.0, which is why `dictionary-editor/languages.ts` pages through `requestCollection` itself. To check a change against the floor, copy the client somewhere, `bun add -d @umbraco-cms/backoffice@17.0.0` and run `tsc --noEmit` (only `browser-test-setup.ts` fails there, on a test-only import). 17.0's Tiptap logs a harmless core warning (`Duplicate extension names found: ['listItem']`) whenever BulletList and OrderedList are both enabled; 17.7 doesn't.
+
 ## What this is
 
 Umbraco.RichDictionary is an **Umbraco 17** backoffice extension, shipped as a C# NuGet package plus a Lit/TypeScript client. It is a drop-in replacement for Umbraco's built-in **Translation** section (the Dictionary). It works the same way, but dictionary values are edited with a rich editor instead of a plain textarea.

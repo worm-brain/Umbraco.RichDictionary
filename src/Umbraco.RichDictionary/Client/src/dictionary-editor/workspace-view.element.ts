@@ -5,6 +5,7 @@ import { UmbLanguageCollectionRepository, type UmbLanguageDetailModel } from "@u
 import { UMB_CURRENT_USER_CONTEXT } from "@umbraco-cms/backoffice/current-user";
 import { getEditorMode } from "../configuration/editor-mode.js";
 import { canEditLanguage } from "./language-access.js";
+import { requestAllLanguages } from "./languages.js";
 import type { RichDictionaryTranslationInputElement, TranslationInputMode } from "./translation-input.element.js";
 import "./translation-input.element.js";
 
@@ -62,9 +63,10 @@ export class RichDictionaryWorkspaceViewElement extends UmbLitElement {
     });
   }
 
+  /** Loads every language on the site, once, to render a field for each. */
   override async firstUpdated() {
-    const { data } = await this.#languageCollectionRepository.requestAllItems();
-    if (data) this._languages = data.items;
+    const languages = await requestAllLanguages(this.#languageCollectionRepository);
+    if (languages) this._languages = languages;
   }
 
   // Read-only until the current user has loaded, then only for languages the user can't access.
