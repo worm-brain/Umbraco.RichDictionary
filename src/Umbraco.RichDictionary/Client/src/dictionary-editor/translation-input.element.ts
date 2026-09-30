@@ -1,9 +1,10 @@
-import { css, customElement, html, property } from "@umbraco-cms/backoffice/external/lit";
+import { css, customElement, html, nothing, property } from "@umbraco-cms/backoffice/external/lit";
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 import { UmbChangeEvent } from "@umbraco-cms/backoffice/event";
 import { UmbPropertyEditorConfigCollection } from "@umbraco-cms/backoffice/property-editor";
 import type { UmbInputTiptapElement } from "@umbraco-cms/backoffice/tiptap";
 import type { EditorMode } from "../api/index.js";
+import { detectForeignFormat } from "./format-mismatch.js";
 import { toTiptapContent } from "./tiptap-content.js";
 
 /**
@@ -104,6 +105,24 @@ export class RichDictionaryTranslationInputElement extends UmbLitElement {
   }
 
   override render() {
+    return html`${this.#renderEditor()}${this.#renderForeignFormatNotice()}`;
+  }
+
+  // Informational only: the notice never touches the stored value, and converting it is left to the editor.
+  #renderForeignFormatNotice() {
+    const format = detectForeignFormat(this.value, this.mode);
+    if (!format) return nothing;
+
+    const message =
+      format === "Markdown"
+        ? "This value looks like Markdown, so the rich text editor shows its syntax as plain text. Check it before saving."
+        : "This value looks like HTML from the rich text editor, so the Markdown editor shows its tags as text. Check it before saving.";
+    return html`<p class="foreign-format" role="status">
+      <uui-icon name="icon-alert"></uui-icon><span>${message}</span>
+    </p>`;
+  }
+
+  #renderEditor() {
     switch (this.mode) {
       case "Rte":
         return html`<umb-input-tiptap
@@ -133,6 +152,15 @@ export class RichDictionaryTranslationInputElement extends UmbLitElement {
     css`
       :host {
         display: block;
+      }
+
+      .foreign-format {
+        display: flex;
+        align-items: center;
+        gap: var(--uui-size-space-2);
+        margin: var(--uui-size-space-2) 0 0;
+        color: var(--uui-color-warning-standalone);
+        font-size: var(--uui-type-small-size);
       }
     `,
   ];
