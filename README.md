@@ -141,6 +141,23 @@ The package does not sanitise output itself. The HTML goes through Umbraco's `IH
 builder.Services.AddUnique<IHtmlSanitizer, MyHtmlSanitizer>();
 ```
 
+## Management API clients
+
+The package declares the format it stores dictionary values in, so a tool that works with the site through the Management API can tell whether they hold HTML or Markdown. `GET /umbraco/management/api/v1/manifest/manifest` includes this extension:
+
+```json
+{
+  "type": "umbracoCli",
+  "alias": "Umbraco.RichDictionary.Cli",
+  "name": "Rich Dictionary",
+  "meta": { "dictionaryValueFormat": "html" }
+}
+```
+
+- `dictionaryValueFormat` is `html` in `Rte` mode (including an unrecognised `EditorMode`) and `markdown` in `Markdown` mode.
+- It comes in its own manifest entry, next to the one from `umbraco-package.json`, with the same package id and version. The entry has no name, so it doesn't show up as a second package in **Packages > Installed**.
+- Umbraco caches manifests. In the `Production` runtime mode, a change to `EditorMode` reaches these tools only after a restart. In the other runtime modes it takes up to 10 seconds.
+
 ## Permissions
 
 The package uses the core Translation section permissions. There is nothing extra to grant.
