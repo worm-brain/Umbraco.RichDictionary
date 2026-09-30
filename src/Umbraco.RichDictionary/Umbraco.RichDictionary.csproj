@@ -15,7 +15,22 @@
     <Title>Umbraco.RichDictionary</Title>
     <Description>Drop-in replacement for the Umbraco Translation section that edits dictionary values with a rich text (Tiptap) or Markdown editor.</Description>
     <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
+    <!-- The one place the version is defined: the client build stamps it into umbraco-package.json (see Client/scripts/umbraco-package-version.ts). -->
+    <Version>1.0.0-beta.1</Version>
+    <Authors>Jack Stunell</Authors>
+    <Copyright>Copyright (c) 2026 Jack Stunell</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/worm-brain/Umbraco.RichDictionary</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/worm-brain/Umbraco.RichDictionary.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- Floor at 17.0.0 so any Umbraco 17 site can install the package; the test site pins the version we develop against. -->
@@ -62,7 +77,8 @@
     />
 
     <Exec Command="bun install --frozen-lockfile" WorkingDirectory="$(ClientDirectory)" Condition="Exists('$(ClientDirectory)bun.lock')" />
-    <Exec Command="bun run build" WorkingDirectory="$(ClientDirectory)" />
+    <!-- Passes the version on so a -p:Version override reaches umbraco-package.json too. -->
+    <Exec Command="bun run build" WorkingDirectory="$(ClientDirectory)" EnvironmentVariables="RICH_DICTIONARY_VERSION=$(PackageVersion)" />
 
     <ItemGroup>
       <Content Remove="$(ClientOutputDirectory)**" />
