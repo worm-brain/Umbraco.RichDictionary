@@ -10,9 +10,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Umbraco.RichDictionary</PackageId>
+    <!--
+      The NuGet id, not the assembly or namespace: the Umbraco. prefix is reserved on nuget.org, so community
+      packages publish as Umbraco.Community.*. It must match the buildTransitive/<PackageId>.targets file name,
+      which is the only name NuGet imports automatically.
+    -->
+    <PackageId>Umbraco.Community.RichDictionary</PackageId>
     <Product>Umbraco.RichDictionary</Product>
-    <Title>Umbraco.RichDictionary</Title>
+    <Title>Umbraco.Community.RichDictionary</Title>
     <Description>Drop-in replacement for the Umbraco Translation section that edits dictionary values with a rich text (Tiptap) or Markdown editor.</Description>
     <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
     <!-- The one place the version is defined: the client build stamps it into umbraco-package.json (see Client/scripts/umbraco-package-version.ts). -->
@@ -25,6 +30,14 @@
     <RepositoryType>git</RepositoryType>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- Debugging support: a .snupkg symbol package, with Source Link (built into the SDK) pointing at the commit. -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <!-- Normalises paths in the PDB for reproducible CI builds; off locally so local debugging maps to real paths. -->
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'"
+      >true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,14 +46,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The appsettings schema, added to the site's appsettings-schema.json by buildTransitive/Umbraco.RichDictionary.targets. -->
+    <!-- The appsettings schema, added to the site's appsettings-schema.json by buildTransitive/Umbraco.Community.RichDictionary.targets. -->
     <Content Remove="appsettings-schema.Umbraco.RichDictionary.json" />
     <None Remove="appsettings-schema.Umbraco.RichDictionary.json" />
     <None Include="appsettings-schema.Umbraco.RichDictionary.json" Pack="true" PackagePath="\" />
     <None
-      Update="buildTransitive\Umbraco.RichDictionary.targets"
+      Update="buildTransitive\Umbraco.Community.RichDictionary.targets"
       Pack="true"
-      PackagePath="buildTransitive\Umbraco.RichDictionary.targets"
+      PackagePath="buildTransitive\Umbraco.Community.RichDictionary.targets"
     />
   </ItemGroup>
 
