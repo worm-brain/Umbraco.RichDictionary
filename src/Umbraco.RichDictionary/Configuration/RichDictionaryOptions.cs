@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Umbraco.RichDictionary.Configuration;
 
 /// <summary>
-/// Which editor the Rich Dictionary section uses for dictionary values. An unrecognised configured value binds as
+/// Which editor the dictionary Edit view uses for dictionary values. An unrecognised configured value binds as
 /// <see cref="Rte"/>, with a warning logged at startup.
 /// </summary>
 [TypeConverter(typeof(EditorModeConverter))]
