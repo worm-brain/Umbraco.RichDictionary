@@ -1,3 +1,5 @@
+![Umbraco RichDictionary logo](https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/logo.svg)
+
 # Umbraco.Community.RichDictionary
 
 Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor instead of a plain textarea.
