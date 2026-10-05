@@ -18,10 +18,10 @@
     <PackageId>Umbraco.Community.RichDictionary</PackageId>
     <Product>Umbraco.RichDictionary</Product>
     <Title>Umbraco.Community.RichDictionary</Title>
-    <Description>Drop-in replacement for the Umbraco Translation section that edits dictionary values with a rich text (Tiptap) or Markdown editor.</Description>
+    <Description>Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor instead of a plain textarea.</Description>
     <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
     <!-- The one place the version is defined: the client build stamps it into umbraco-package.json (see Client/scripts/umbraco-package-version.ts). -->
-    <Version>1.0.0-beta.2</Version>
+    <Version>1.0.0</Version>
     <Authors>Jack Stunell</Authors>
     <Copyright>Copyright (c) 2026 Jack Stunell</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

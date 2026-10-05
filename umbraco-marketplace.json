@@ -1,0 +1,20 @@
+{
+  "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "Category": "Translations",
+  "AlternateCategory": "Editor Tools",
+  "PackageType": "Package",
+  "LicenseTypes": ["Free"],
+  "DocumentationUrl": "https://github.com/worm-brain/Umbraco.RichDictionary#readme",
+  "IssueTrackerUrl": "https://github.com/worm-brain/Umbraco.RichDictionary/issues",
+  "Tags": ["dictionary", "translation", "rich text", "tiptap", "markdown"],
+  "Screenshots": [
+    {
+      "ImageUrl": "https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/editor-rte.png",
+      "Caption": "Rte mode (the default): each language gets Umbraco's own Tiptap rich text editor."
+    },
+    {
+      "ImageUrl": "https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/editor-markdown.png",
+      "Caption": "Markdown mode: each language gets Umbraco's Markdown editor."
+    }
+  ]
+}
