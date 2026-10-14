@@ -16,6 +16,10 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static class RichDictionaryUmbracoHelperExtensions
 {
+    // The current-culture overloads pass CultureInfo.CurrentUICulture explicitly. That is exactly what
+    // Umbraco's own GetDictionaryValue(key) does (Thread.CurrentThread.CurrentUICulture, 17.0 to 17.7),
+    // so the behaviour matches core while the culture stays visible here (CA1304).
+
     /// <summary>
     /// Gets a dictionary value for the current culture as block HTML.
     /// </summary>
@@ -23,7 +27,9 @@ public static class RichDictionaryUmbracoHelperExtensions
     /// <param name="key">The dictionary item key, e.g. <c>Footer.Address</c>.</param>
     /// <returns>The HTML, or empty when the item or its translation doesn't exist.</returns>
     public static IHtmlContent GetDictionaryHtml(this UmbracoHelper umbraco, string key) =>
-        DictionaryHtmlServices.Converter.ToHtml(umbraco.GetDictionaryValue(key));
+        DictionaryHtmlServices.Converter.ToHtml(
+            umbraco.GetDictionaryValue(key, CultureInfo.CurrentUICulture)
+        );
 
     /// <summary>
     /// Gets a dictionary value for a specific culture as block HTML.
@@ -46,7 +52,9 @@ public static class RichDictionaryUmbracoHelperExtensions
     /// <param name="key">The dictionary item key, e.g. <c>Nav.Home</c>.</param>
     /// <returns>The HTML, or empty when the item or its translation doesn't exist.</returns>
     public static IHtmlContent GetDictionaryInlineHtml(this UmbracoHelper umbraco, string key) =>
-        DictionaryHtmlServices.Converter.ToInlineHtml(umbraco.GetDictionaryValue(key));
+        DictionaryHtmlServices.Converter.ToInlineHtml(
+            umbraco.GetDictionaryValue(key, CultureInfo.CurrentUICulture)
+        );
 
     /// <summary>
     /// Gets a dictionary value for a specific culture as inline HTML; see

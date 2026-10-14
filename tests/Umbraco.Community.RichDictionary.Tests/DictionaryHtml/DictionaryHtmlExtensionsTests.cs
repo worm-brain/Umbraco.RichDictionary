@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -18,12 +19,17 @@ namespace Umbraco.Community.RichDictionary.Tests.DictionaryHtml;
 /// Serialises the tests that swap <see cref="StaticServiceProvider.Instance"/>, which is process-wide.
 /// </summary>
 [CollectionDefinition(Name, DisableParallelization = true)]
-public sealed class StaticServiceProviderCollection
+public sealed class StaticServiceProviderCollectionDefinition
 {
     public const string Name = "StaticServiceProvider";
 }
 
-[Collection(StaticServiceProviderCollection.Name)]
+[Collection(StaticServiceProviderCollectionDefinition.Name)]
+[SuppressMessage(
+    "Globalization",
+    "CA1304:Specify CultureInfo",
+    Justification = "These tests exercise the current-culture overloads on purpose."
+)]
 public sealed class DictionaryHtmlExtensionsTests : IDisposable
 {
     private readonly IServiceProvider _previousProvider = StaticServiceProvider.Instance;
@@ -57,9 +63,16 @@ public sealed class DictionaryHtmlExtensionsTests : IDisposable
         ICultureDictionary? specificCulture = null
     )
     {
+        // UmbracoHelper asks the factory for one dictionary per culture, including the current UI
+        // culture for the lookups that don't name one.
         var factory = Substitute.For<ICultureDictionaryFactory>();
-        factory.CreateDictionary().Returns(current);
-        factory.CreateDictionary(Arg.Any<CultureInfo>()).Returns(specificCulture ?? current);
+        factory
+            .CreateDictionary(Arg.Any<CultureInfo>())
+            .Returns(call =>
+                call.Arg<CultureInfo>().Equals(CultureInfo.CurrentUICulture)
+                    ? current
+                    : specificCulture ?? current
+            );
         return new UmbracoHelper(
             factory,
             Substitute.For<IUmbracoComponentRenderer>(),
