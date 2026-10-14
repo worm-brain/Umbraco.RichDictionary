@@ -468,3 +468,8 @@ __screenshots__/
 ## Playwright e2e suite: results and the HTML report
 src/Umbraco.Community.RichDictionary/Client/e2e/test-results/
 src/Umbraco.Community.RichDictionary/Client/e2e/playwright-report/
+
+## Agent configuration: the maintainer's private imports, and anything a tool keeps locally
+CLAUDE.local.md
+.claude/*
+!.claude/settings.json

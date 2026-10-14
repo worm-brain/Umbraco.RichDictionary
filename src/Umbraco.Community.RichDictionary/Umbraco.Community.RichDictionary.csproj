@@ -23,14 +23,8 @@
       Client/scripts/umbraco-package-version.ts).
     -->
     <Version>$(UmbracoMajor).0.0-dev</Version>
-    <!-- Authors, licence, repository, Source Link and symbol package settings are shared, in Directory.Build.props. -->
+    <!-- Authors, licence, repository, Source Link, symbols, icon and NuGet readme are shared, in Directory.Build.props. -->
   </PropertyGroup>
-
-  <!-- The files named by PackageIcon and PackageReadmeFile in Directory.Build.props. -->
-  <ItemGroup>
-    <None Update="icon.png" Pack="true" PackagePath="\" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
-  </ItemGroup>
 
   <ItemGroup>
     <!-- The appsettings schema, added to the site's appsettings-schema.json by buildTransitive/Umbraco.Community.RichDictionary.targets. -->
