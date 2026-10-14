@@ -6,6 +6,8 @@ All notable user-visible changes to this project are documented here. The format
 
 ## [Unreleased]
 
+## [17.0.0] and [18.0.0] - 2026-10-14
+
 The first release of each package line: `17.0.0` for Umbraco 17 and `18.0.0` for Umbraco 18. The
 package version now follows the Umbraco major, so `17.0.0` is the next version after `1.0.0`, and
 it has breaking changes.
