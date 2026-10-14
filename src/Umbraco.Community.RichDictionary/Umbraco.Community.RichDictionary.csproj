@@ -17,7 +17,7 @@
     -->
     <PackageId>Umbraco.Community.RichDictionary</PackageId>
     <Product>Umbraco.Community.RichDictionary</Product>
-    <Title>Umbraco.Community.RichDictionary</Title>
+    <Title>Umbraco Rich Dictionary</Title>
     <Description>Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor instead of a plain textarea.</Description>
     <PackageTags>umbraco;umbraco-marketplace;dictionary;translation;tiptap;markdown</PackageTags>
     <!-- The one place the version is defined: the client build stamps it into umbraco-package.json (see Client/scripts/umbraco-package-version.ts). -->
