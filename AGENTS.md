@@ -54,7 +54,7 @@ bun install
 bun run format:check && bun run typecheck && bun run test && bun run test:browser && bun run build
 bun run e2e                # Playwright against both sample sites, on ports 44444 (17) and 44454 (18)
 bun run docs:screenshots   # retake docs/images/editor-*.png from the Umbraco 17 sample site
-bun run generate-client    # regenerate src/api/ from the running Umbraco 17 sample site
+bun run generate           # regenerate src/api/ from the running Umbraco 17 sample site
 
 # Sample sites; build the client first, because its output is gitignored
 dotnet run --project samples/RichDictionary.Site17                      # https://localhost:44440/umbraco

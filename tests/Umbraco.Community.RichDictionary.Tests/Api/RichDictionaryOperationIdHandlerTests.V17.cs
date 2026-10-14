@@ -14,7 +14,7 @@ namespace Umbraco.Community.RichDictionary.Tests.Api;
 /// Umbraco 17 only (Umbraco 18 has no operation id handlers).
 /// The handler picks the package's controllers by namespace prefix. If that prefix stops matching (a
 /// namespace rename), the build still passes but the Swagger document falls back to Umbraco's long operation
-/// ids, and the next <c>bun run generate-client</c> renames every method in <c>src/api</c>.
+/// ids, and the next <c>bun run generate</c> renames every method in <c>src/api</c>.
 /// </summary>
 public class RichDictionaryOperationIdHandlerTests
 {
