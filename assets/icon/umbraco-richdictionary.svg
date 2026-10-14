@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Umbraco RichDictionary">
-  <title>Umbraco RichDictionary</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Umbraco Rich Dictionary">
+  <title>Umbraco Rich Dictionary</title>
   <rect width="128" height="128" rx="28" fill="#C8352B"/>
   <g fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M64 48C56 42 44 40 32 42V84C44 82 56 84 64 90C72 84 84 82 96 84V42C84 40 72 42 64 48Z"/>
