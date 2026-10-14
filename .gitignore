@@ -464,3 +464,7 @@ src/Umbraco.Community.RichDictionary/wwwroot/App_Plugins/
 # Screenshots and attachments Vitest browser mode saves when a component test fails
 __screenshots__/
 .vitest-attachments/
+
+## Playwright e2e suite: results and the HTML report
+src/Umbraco.Community.RichDictionary/Client/e2e/test-results/
+src/Umbraco.Community.RichDictionary/Client/e2e/playwright-report/
