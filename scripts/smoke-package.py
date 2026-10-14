@@ -32,14 +32,13 @@ from umbraco_spawn_harness import (SpawnError, die, get_text, heading, nuget_glo
                                    scaffold, utf8_stdio, warn)
 
 REPO = Path(__file__).resolve().parent.parent
-PROJECT = REPO / "src" / "Umbraco.RichDictionary"
+PROJECT = REPO / "src" / "Umbraco.Community.RichDictionary"
 
-# The ids the package uses inside Umbraco. They differ from the NuGet id (Umbraco.Community.RichDictionary)
-# on purpose; see CLAUDE.md.
-MANIFEST_ID = "Umbraco.RichDictionary"
+# The ids the package uses inside Umbraco. The API route keeps its original name; see CLAUDE.md.
+MANIFEST_ID = "Umbraco.Community.RichDictionary"
 CLI_EXTENSION_TYPE = "umbracoCli"
 CONFIGURATION_PATH = "/umbraco/umbracorichdictionary/api/v1/configuration"
-SCHEMA_FILE = "appsettings-schema.Umbraco.RichDictionary.json"
+SCHEMA_FILE = "appsettings-schema.Umbraco.Community.RichDictionary.json"
 
 # EditorMode -> the `dictionaryValueFormat` the CLI declaration should advertise (CliManifestReader).
 MODES = {"Rte": "html", "Markdown": "markdown"}

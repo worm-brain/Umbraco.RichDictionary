@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Umbraco.Community.RichDictionary.TestSite/Umbraco.Community.RichDictionary.TestSite.csproj" />
+    <Project Path="src/Umbraco.Community.RichDictionary/Umbraco.Community.RichDictionary.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Umbraco.Community.RichDictionary.Tests/Umbraco.Community.RichDictionary.Tests.csproj" />
+  </Folder>
+</Solution>

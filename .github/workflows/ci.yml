@@ -24,12 +24,12 @@ jobs:
       # C#: format, build, test.
       - run: dotnet tool restore
       - run: dotnet csharpier check .
-      - run: dotnet build Umbraco.RichDictionary.slnx
-      - run: dotnet test Umbraco.RichDictionary.slnx --no-build
+      - run: dotnet build Umbraco.Community.RichDictionary.slnx
+      - run: dotnet test Umbraco.Community.RichDictionary.slnx --no-build
 
       # Client: format, typecheck, unit tests, then the component tests in Chromium.
       - name: Client checks
-        working-directory: src/Umbraco.RichDictionary/Client
+        working-directory: src/Umbraco.Community.RichDictionary/Client
         run: |
           bun install --frozen-lockfile
           bun run format:check
@@ -39,7 +39,7 @@ jobs:
           bun run test:browser
 
       # Packing builds the client itself; this proves a clean checkout produces a complete package.
-      - run: dotnet pack src/Umbraco.RichDictionary -o artifacts
+      - run: dotnet pack src/Umbraco.Community.RichDictionary -o artifacts
       - uses: actions/upload-artifact@v7
         with:
           name: packages

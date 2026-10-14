@@ -109,7 +109,7 @@ Outside views, get one from `ICultureDictionaryFactory.CreateDictionary()`.
 
 ### Anywhere else: inject `IDictionaryHtmlConverter`
 
-The helpers use `Umbraco.RichDictionary.DictionaryHtml.IDictionaryHtmlConverter`, which is registered in DI. Inject it where there is no `UmbracoHelper`, such as a view component, a controller or an email template. It converts a value you have already read:
+The helpers use `Umbraco.Community.RichDictionary.DictionaryHtml.IDictionaryHtmlConverter`, which is registered in DI. Inject it where there is no `UmbracoHelper`, such as a view component, a controller or an email template. It converts a value you have already read:
 
 - `IHtmlContent ToHtml(string? value)`: block HTML.
 - `IHtmlContent ToInlineHtml(string? value)`: inline HTML, as `GetDictionaryInlineHtml`.
@@ -118,7 +118,7 @@ The helpers use `Umbraco.RichDictionary.DictionaryHtml.IDictionaryHtmlConverter`
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Dictionary;
-using Umbraco.RichDictionary.DictionaryHtml;
+using Umbraco.Community.RichDictionary.DictionaryHtml;
 
 public class FooterViewComponent(
     ICultureDictionaryFactory dictionaryFactory,
@@ -200,7 +200,7 @@ Remove the package and restart. The stock Translation editor comes back, and the
 - Views that call `GetDictionaryHtml`, `GetDictionaryInlineHtml`, `GetHtml` or `GetInlineHtml`, or inject `IDictionaryHtmlConverter`, stop compiling. With runtime Razor compilation (the development default) that shows up when the page is requested, not at build time. Switch them back to `GetDictionaryValue`.
 - With central package management, `dotnet remove package` leaves the `PackageVersion` entry in `Directory.Packages.props`. It's harmless; delete it by hand.
 - A leftover `RichDictionary` section in `appsettings.json` is ignored. Delete it when convenient.
-- Umbraco does not remove the copied `appsettings-schema.Umbraco.RichDictionary.json` from your site, or its `$ref` in `appsettings-schema.json`. Delete both by hand.
+- Umbraco does not remove the copied `appsettings-schema.Umbraco.Community.RichDictionary.json` from your site, or its `$ref` in `appsettings-schema.json`. Delete both by hand.
 
 ## Contributing
 
