@@ -145,8 +145,9 @@ dotnet run --project samples/RichDictionary.Site18 -p:UmbracoMajor=18
 Each sample site runs on one major. A solution build for the other major skips it, and building or
 running it on its own for the other major fails with the switch to use. Both sample sites install
 themselves on first run (SQLite) and sign in with `admin@example.com` / `1234567890` (development
-only). The install writes an `Imaging:HMACSecretKey` into the site's `appsettings.json`; do not
-commit it.
+only). The same `appsettings.Development.json` sets a fixed, development-only
+`Umbraco:CMS:Imaging:HMACSecretKey`, so the install does not write a generated key into
+`appsettings.json`; never commit a key there.
 
 ## Test
 
