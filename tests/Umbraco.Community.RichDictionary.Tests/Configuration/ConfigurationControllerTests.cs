@@ -15,6 +15,16 @@ public class ConfigurationControllerTests
         "6a1f3c52-0a4b-4a8e-9c1d-2f5e7b8c9d01"
     );
 
+    // The data type's saved Tiptap configuration, unless a test passes its own toolbar.
+    private static readonly string[] DefaultExtensions = ["Umb.Tiptap.Bold", "Umb.Tiptap.Link"];
+    private static readonly string[][][] DefaultToolbar =
+    [
+        [
+            ["Umb.Tiptap.Toolbar.Bold"],
+            ["Umb.Tiptap.Toolbar.Link"],
+        ],
+    ];
+
     private readonly IDataTypeService _dataTypeService = Substitute.For<IDataTypeService>();
 
     [Theory]
@@ -187,20 +197,8 @@ public class ConfigurationControllerTests
         dataType.ConfigurationData.Returns(
             new Dictionary<string, object>
             {
-                ["extensions"] = JsonSerializer.SerializeToElement(
-                    new[] { "Umb.Tiptap.Bold", "Umb.Tiptap.Link" }
-                ),
-                ["toolbar"] = JsonSerializer.SerializeToElement(
-                    toolbar
-                        ?? new[]
-                        {
-                            new[]
-                            {
-                                new[] { "Umb.Tiptap.Toolbar.Bold" },
-                                new[] { "Umb.Tiptap.Toolbar.Link" },
-                            },
-                        }
-                ),
+                ["extensions"] = JsonSerializer.SerializeToElement(DefaultExtensions),
+                ["toolbar"] = JsonSerializer.SerializeToElement(toolbar ?? DefaultToolbar),
             }
         );
         return dataType;

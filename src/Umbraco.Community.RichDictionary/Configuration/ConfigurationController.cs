@@ -54,7 +54,7 @@ public sealed record RichTextEditorResponseModel(
 /// </remarks>
 [ApiVersion("1.0")]
 [ApiExplorerSettings(GroupName = "Configuration")]
-public sealed class ConfigurationController(
+public sealed partial class ConfigurationController(
     IOptionsMonitor<RichDictionaryOptions> options,
     IDataTypeService dataTypeService,
     ILogger<ConfigurationController> logger
@@ -90,17 +90,13 @@ public sealed class ConfigurationController(
 
         if (dataType is null)
         {
-            logger.LogWarning(
-                "RichDictionary:RichTextDataType {DataType} does not match a data type's key or name; using the default dictionary toolbar.",
-                dataTypeSetting
-            );
+            LogDataTypeNotFound(dataTypeSetting);
             return null;
         }
 
         if (dataType.EditorAlias != CoreConstants.PropertyEditors.Aliases.RichText)
         {
-            logger.LogWarning(
-                "RichDictionary:RichTextDataType {DataType} uses the {EditorAlias} property editor, not {RichText}; using the default dictionary toolbar.",
+            LogDataTypeNotRichText(
                 dataTypeSetting,
                 dataType.EditorAlias,
                 CoreConstants.PropertyEditors.Aliases.RichText
@@ -112,10 +108,7 @@ public sealed class ConfigurationController(
         var toolbar = ReadConfiguration<string[][][]>(dataType, "toolbar");
         if (extensions is null || toolbar is null)
         {
-            logger.LogWarning(
-                "RichDictionary:RichTextDataType {DataType} has no readable Tiptap extensions and toolbar; using the default dictionary toolbar.",
-                dataTypeSetting
-            );
+            LogDataTypeUnreadable(dataTypeSetting);
             return null;
         }
 
@@ -142,4 +135,26 @@ public sealed class ConfigurationController(
             return null;
         }
     }
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "RichDictionary:RichTextDataType {DataType} does not match a data type's key or name; using the default dictionary toolbar."
+    )]
+    private partial void LogDataTypeNotFound(string dataType);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "RichDictionary:RichTextDataType {DataType} uses the {EditorAlias} property editor, not {RichText}; using the default dictionary toolbar."
+    )]
+    private partial void LogDataTypeNotRichText(
+        string dataType,
+        string editorAlias,
+        string richText
+    );
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "RichDictionary:RichTextDataType {DataType} has no readable Tiptap extensions and toolbar; using the default dictionary toolbar."
+    )]
+    private partial void LogDataTypeUnreadable(string dataType);
 }

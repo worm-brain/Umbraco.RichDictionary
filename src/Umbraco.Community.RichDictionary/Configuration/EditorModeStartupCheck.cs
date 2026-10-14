@@ -13,7 +13,7 @@ namespace Umbraco.Community.RichDictionary.Configuration;
 /// </summary>
 /// <param name="configuration">The site configuration, read raw because the bound options have already fallen back.</param>
 /// <param name="logger">Where the warning goes.</param>
-internal sealed class EditorModeStartupCheck(
+internal sealed partial class EditorModeStartupCheck(
     IConfiguration configuration,
     ILogger<EditorModeStartupCheck> logger
 ) : INotificationHandler<UmbracoApplicationStartingNotification>
@@ -33,12 +33,22 @@ internal sealed class EditorModeStartupCheck(
             return;
         }
 
-        logger.LogWarning(
-            "{Setting} is set to {EditorMode}, which is not a recognised editor mode, so {Fallback} is used instead. Valid values: {ValidValues}.",
+        LogUnrecognisedEditorMode(
             SettingKey,
             value,
             EditorMode.Rte,
             string.Join(", ", Enum.GetNames<EditorMode>())
         );
     }
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "{Setting} is set to {EditorMode}, which is not a recognised editor mode, so {Fallback} is used instead. Valid values: {ValidValues}."
+    )]
+    private partial void LogUnrecognisedEditorMode(
+        string setting,
+        string editorMode,
+        EditorMode fallback,
+        string validValues
+    );
 }
