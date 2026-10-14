@@ -124,7 +124,7 @@ public class CliManifestReaderTests
 
         // Assert
         Assert.Equal(
-            """[{"type":"umbracoCli","alias":"Umbraco.RichDictionary.Cli","name":"Rich Dictionary","meta":{"dictionaryValueFormat":"markdown"}}]""",
+            """[{"type":"umbracoCli","alias":"Umbraco.Community.RichDictionary.Cli","name":"Rich Dictionary","meta":{"dictionaryValueFormat":"markdown"}}]""",
             JsonSerializer.Serialize(manifest.Extensions, ApiJson)
         );
     }

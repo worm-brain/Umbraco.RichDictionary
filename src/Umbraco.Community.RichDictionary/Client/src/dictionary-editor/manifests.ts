@@ -6,7 +6,7 @@ import { UMB_DICTIONARY_WORKSPACE_ALIAS } from "@umbraco-cms/backoffice/dictiona
 export const manifests: Array<UmbExtensionManifest> = [
   {
     type: "workspaceView",
-    alias: "Umbraco.RichDictionary.WorkspaceView.Dictionary.Edit",
+    alias: "Umbraco.Community.RichDictionary.WorkspaceView.Dictionary.Edit",
     name: "Rich Dictionary Workspace Edit View",
     element: () => import("./workspace-view.element.js"),
     weight: 100,

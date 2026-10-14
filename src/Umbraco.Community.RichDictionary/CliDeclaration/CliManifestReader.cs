@@ -58,7 +58,7 @@ internal sealed class CliManifestReader(IOptionsMonitor<RichDictionaryOptions> o
                 new Dictionary<string, object>
                 {
                     ["type"] = "umbracoCli",
-                    ["alias"] = "Umbraco.RichDictionary.Cli",
+                    ["alias"] = "Umbraco.Community.RichDictionary.Cli",
                     ["name"] = "Rich Dictionary",
                     ["meta"] = new Dictionary<string, string>
                     {

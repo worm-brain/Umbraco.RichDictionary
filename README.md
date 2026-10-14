@@ -160,7 +160,7 @@ The package declares the format it stores dictionary values in, so a tool that w
 ```json
 {
   "type": "umbracoCli",
-  "alias": "Umbraco.RichDictionary.Cli",
+  "alias": "Umbraco.Community.RichDictionary.Cli",
   "name": "Rich Dictionary",
   "meta": { "dictionaryValueFormat": "html" }
 }
