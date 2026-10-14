@@ -1,3 +1,4 @@
+#if UMBRACO_17
 using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -10,13 +11,14 @@ using Umbraco.Community.RichDictionary.Configuration;
 namespace Umbraco.Community.RichDictionary.Tests.Api;
 
 /// <summary>
+/// Umbraco 17 only (Umbraco 18 has no operation id handlers).
 /// The handler picks the package's controllers by namespace prefix. If that prefix stops matching (a
 /// namespace rename), the build still passes but the Swagger document falls back to Umbraco's long operation
 /// ids, and the next <c>bun run generate-client</c> renames every method in <c>src/api</c>.
 /// </summary>
 public class RichDictionaryOperationIdHandlerTests
 {
-    private readonly RichDictionaryApiComposer.RichDictionaryOperationIdHandler _handler = new(
+    private readonly RichDictionaryApiDocument.RichDictionaryOperationIdHandler _handler = new(
         Options.Create(new ApiVersioningOptions())
     );
 
@@ -56,3 +58,4 @@ public class RichDictionaryOperationIdHandlerTests
             },
         };
 }
+#endif
