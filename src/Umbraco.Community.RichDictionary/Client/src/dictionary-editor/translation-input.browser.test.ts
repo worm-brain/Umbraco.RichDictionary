@@ -74,7 +74,7 @@ describe("rich-dictionary-translation-input in Rte mode", () => {
 
   it("does not dispatch change when a value is loaded, even one converted from plain text", async () => {
     const { input, changes, editor } = renderInput("Rte", "Prices from < £10\nFree delivery");
-    await expect.element(editor).toHaveTextContent("Free delivery");
+    await expect.element(editor).toMatchTextContent("Free delivery");
 
     await settle(input);
 
