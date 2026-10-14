@@ -15,7 +15,7 @@
     "e2e": "bun e2e/prepare.ts && playwright test",
     "e2e:report": "playwright show-report e2e/playwright-report",
     "docs:screenshots": "playwright test -c playwright.docs.config.ts",
-    "generate-client": "bun scripts/generate-openapi.ts https://localhost:44440/umbraco/swagger/umbracorichdictionary/swagger.json"
+    "generate": "bun scripts/generate-openapi.ts https://localhost:44440/umbraco/swagger/umbracorichdictionary/swagger.json"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

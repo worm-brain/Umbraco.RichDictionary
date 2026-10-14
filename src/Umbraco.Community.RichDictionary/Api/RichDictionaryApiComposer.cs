@@ -5,7 +5,7 @@ namespace Umbraco.Community.RichDictionary.Api;
 
 /// <summary>
 /// Registers the package's API document so that its endpoints show up in the back-office API UI
-/// and the TypeScript client can be generated from them (<c>bun run generate-client</c>).
+/// and the TypeScript client can be generated from them (<c>bun run generate</c>).
 /// </summary>
 /// <remarks>
 /// Registering an API document differs between Umbraco majors (Swashbuckle in 17,

@@ -6,7 +6,12 @@ type Response = { data?: { editorMode?: unknown; richTextDataType?: string | nul
 /** A fake server that answers each request with the next queued response. */
 function fakeServer(...responses: Array<() => Promise<Response>>) {
   let requests = 0;
-  const fetchConfiguration = () => responses[requests++]();
+  const fetchConfiguration = () => {
+    const next = responses[requests++];
+    // Fail loudly when a test makes more requests than it queued answers for.
+    if (!next) throw new Error(`Unexpected request ${requests}: no response queued`);
+    return next();
+  };
   return { fetchConfiguration, requests: () => requests };
 }
 
