@@ -482,16 +482,16 @@ $RECYCLE.BIN/
 *.swp
 
 ## Umbraco test site runtime state (SQLite database, logs, caches, generated models, uploaded media)
-src/Umbraco.RichDictionary.TestSite/umbraco/
-src/Umbraco.RichDictionary.TestSite/wwwroot/media/
+src/Umbraco.Community.RichDictionary.TestSite/umbraco/
+src/Umbraco.Community.RichDictionary.TestSite/wwwroot/media/
 
 ## Lit client: dependencies and build output (rebuilt by `bun run build` in Client/)
 node_modules/
-src/Umbraco.RichDictionary/wwwroot/App_Plugins/
+src/Umbraco.Community.RichDictionary/wwwroot/App_Plugins/
 # Screenshots and attachments Vitest browser mode saves when a component test fails
 __screenshots__/
 .vitest-attachments/
 
 ## JSON schemas Umbraco regenerates on every build of the test site
-src/Umbraco.RichDictionary.TestSite/appsettings-schema*.json
-src/Umbraco.RichDictionary.TestSite/umbraco-package-schema.json
+src/Umbraco.Community.RichDictionary.TestSite/appsettings-schema*.json
+src/Umbraco.Community.RichDictionary.TestSite/umbraco-package-schema.json

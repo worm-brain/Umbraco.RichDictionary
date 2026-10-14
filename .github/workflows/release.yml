@@ -29,16 +29,16 @@ jobs:
       # The version lives once, in the package csproj; refuse to publish a tag that disagrees with it.
       - name: Check the tag matches the package version
         run: |
-          version=$(dotnet msbuild src/Umbraco.RichDictionary -getProperty:Version)
+          version=$(dotnet msbuild src/Umbraco.Community.RichDictionary -getProperty:Version)
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match <Version>$version</Version> in the package csproj."
             exit 1
           fi
 
-      - run: dotnet test Umbraco.RichDictionary.slnx
+      - run: dotnet test Umbraco.Community.RichDictionary.slnx
 
       # Builds the client too, and produces the .nupkg and its .snupkg symbol package.
-      - run: dotnet pack src/Umbraco.RichDictionary -o artifacts
+      - run: dotnet pack src/Umbraco.Community.RichDictionary -o artifacts
 
       - uses: NuGet/login@v1
         id: nuget-login
