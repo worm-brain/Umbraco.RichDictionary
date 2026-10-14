@@ -183,7 +183,7 @@ describe("rich-dictionary-workspace-view", () => {
       mode: "Rte",
       translations: [{ isoCode: "en-GB", translation: "Prices from < £10\nFree delivery" }],
     });
-    await expect.element(english).toHaveTextContent("Free delivery");
+    await expect.element(english).toMatchTextContent("Free delivery");
 
     await settle();
 
