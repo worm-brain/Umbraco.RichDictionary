@@ -12,7 +12,7 @@
     "typecheck": "tsc",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate-client": "bun scripts/generate-openapi.ts https://localhost:44336/umbraco/swagger/umbracorichdictionary/swagger.json"
+    "generate-client": "bun scripts/generate-openapi.ts https://localhost:44440/umbraco/swagger/umbracorichdictionary/swagger.json"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "^0.99.0",

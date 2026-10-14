@@ -452,16 +452,15 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-## Umbraco test site runtime state (SQLite database, logs, caches, generated models, uploaded media)
-src/Umbraco.Community.RichDictionary.TestSite/umbraco/
-src/Umbraco.Community.RichDictionary.TestSite/wwwroot/media/
+## Sample sites runtime state (SQLite database, logs, caches, generated models, uploaded media)
+## and the JSON schemas Umbraco regenerates on every build
+samples/*/umbraco/
+samples/*/wwwroot/media/
+samples/*/appsettings-schema*.json
+samples/*/umbraco-package-schema.json
 
 ## Lit client build output (rebuilt by `bun run build` in Client/); node_modules/ is ignored above
 src/Umbraco.Community.RichDictionary/wwwroot/App_Plugins/
 # Screenshots and attachments Vitest browser mode saves when a component test fails
 __screenshots__/
 .vitest-attachments/
-
-## JSON schemas Umbraco regenerates on every build of the test site
-src/Umbraco.Community.RichDictionary.TestSite/appsettings-schema*.json
-src/Umbraco.Community.RichDictionary.TestSite/umbraco-package-schema.json

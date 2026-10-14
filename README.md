@@ -18,7 +18,7 @@ The **Translation** section stays exactly as Umbraco ships it: the tree, create,
 
 ## Requirements
 
-- Umbraco 17.x (.NET 10). Tested on fresh 17.0.0 and 17.7.0 sites.
+- Umbraco 17.x or 18.x (.NET 10), with the package line of the same major: 17.x.y for Umbraco 17, 18.x.y for Umbraco 18. Tested on fresh 17.0.0, 17.7.1, 18.0.0 and 18.2.1 sites.
 
 ## Install
 

@@ -20,6 +20,12 @@ describe("resolvePackageVersion", () => {
     expect(resolvePackageVersion("", csproj)).toBe("1.0.0-beta.1");
   });
 
+  it("falls back to 0.0.0-dev when the csproj <Version> is an MSBuild expression", () => {
+    const perMajor = "<Project><PropertyGroup><Version>$(UmbracoMajor).0.0-dev</Version></PropertyGroup></Project>";
+
+    expect(resolvePackageVersion(undefined, perMajor)).toBe("0.0.0-dev");
+  });
+
   it("throws when neither source has a version", () => {
     expect(() => resolvePackageVersion(undefined, "<Project />")).toThrow(/No <Version>/);
   });

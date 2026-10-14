@@ -11,8 +11,9 @@ import type { Plugin } from "vite";
  *
  * @param envVersion - `RICH_DICTIONARY_VERSION`, which `dotnet pack` sets from `$(PackageVersion)`, so a
  *   `-p:Version=...` override reaches the manifest too. Empty or unset during day-to-day `bun run build`/`watch`.
- * @param csproj - The package `.csproj` source, whose `<Version>` is the fallback.
- * @returns The version.
+ * @param csproj - The package `.csproj` source, whose `<Version>` is the fallback when it is a literal version.
+ * @returns The version, or `0.0.0-dev` when the csproj `<Version>` is an MSBuild expression (such as
+ *   `$(UmbracoMajor).0.0-dev`) that only MSBuild can evaluate.
  * @throws When neither source has a version, so a build never ships a manifest with a made-up one.
  */
 export function resolvePackageVersion(envVersion: string | undefined, csproj: string): string {
@@ -24,7 +25,8 @@ export function resolvePackageVersion(envVersion: string | undefined, csproj: st
   if (!version) {
     throw new Error("No <Version> in the package .csproj and RICH_DICTIONARY_VERSION is not set.");
   }
-  return version;
+  // A day-to-day build without dotnet pack: an unevaluated property must not end up in the manifest.
+  return version.includes("$(") ? "0.0.0-dev" : version;
 }
 
 /**
