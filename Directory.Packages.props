@@ -1,0 +1,52 @@
+<Project>
+  <!-- Central package management: every package version is declared once, here. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!--
+    UmbracoPackageRange: what the package compiles against (the floor) and declares to NuGet, so any
+    Umbraco 17 site can install it.
+    UmbracoDevVersion: the concrete version the test site and tests run, pinned with VersionOverride
+    where a project references a package that also carries the range.
+  -->
+  <PropertyGroup>
+    <UmbracoPackageRange>[17.0.0, 18.0.0)</UmbracoPackageRange>
+    <UmbracoDevVersion>17.7.0</UmbracoDevVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="Umbraco">
+    <PackageVersion Include="Umbraco.Cms.Web.Website" Version="$(UmbracoPackageRange)" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="$(UmbracoPackageRange)" />
+    <PackageVersion Include="Umbraco.Cms" Version="$(UmbracoDevVersion)" />
+    <PackageVersion
+      Include="Umbraco.Cms.DevelopmentMode.Backoffice"
+      Version="$(UmbracoDevVersion)"
+    />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Label="Package">
+    <!--
+      A floor, not a pin: Umbraco references Markdig from 17.x onwards (0.45.0 in 17.7), and this lower
+      bound lets NuGet unify with it rather than pin a second copy. Umbraco 17.0 used a different
+      Markdown library.
+    -->
+    <PackageVersion Include="Markdig" Version="0.41.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Security">
+    <!--
+      Patched versions of packages Umbraco brings in transitively, for the test and sample projects
+      only (the package itself audits direct references only). Remove these once Umbraco ships them.
+    -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.13" />
+  </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="xunit.v3" Version="4.0.1" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+  </ItemGroup>
+</Project>
