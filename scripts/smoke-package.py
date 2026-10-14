@@ -4,13 +4,15 @@
 # ///
 """smoke-package.py - the pre-release check: install the packed .nupkg on fresh Umbraco sites.
 
-  uv run scripts/smoke-package.py [--umbraco 17.0.0 --umbraco 17 ...] [--package <file.nupkg>] [--keep]
+  uv run scripts/smoke-package.py [--major 17|18] [--umbraco 17.0.0 --umbraco 17 ...] [--package <file.nupkg>] [--keep]
 
 The test site references the package *project*, so it never sees what `dotnet pack` produces. This packs the
 package (with a unique `-smoke.<timestamp>` version, so NuGet's global cache can't serve a stale copy), then for
 each Umbraco version spawns a throwaway site with umbraco-spawn-harness, installs the .nupkg from the local folder
 and checks it through the Management API, first in the default `Rte` mode (no RichDictionary config at all) and
-then in `Markdown` mode. By default that is the 17.0.0 floor and the newest 17.x.
+then in `Markdown` mode. The package is built once per Umbraco major: `--major` (default 17) packs that
+major's package line (`-p:UmbracoMajor=<major>`), and by default tests it on the major's floor (`<major>.0.0`)
+and its newest release.
 
 `--package` skips the pack and tests an existing .nupkg instead (one downloaded from nuget.org, say).
 Exits 1 when any version fails. Sites go in a temp folder that is deleted afterwards; `--keep` leaves it there,
@@ -61,25 +63,27 @@ def check(condition, message):
 
 
 # ----------------------------------------------------------------- pack --
-def pack(out_dir):
+def pack(out_dir, major):
     """Pack the package into `out_dir` with a unique smoke version (this also builds the client, so needs Bun).
 
     :param out_dir: the folder for the .nupkg.
+    :param major: the Umbraco major to build the package for (17 or 18).
     :returns: the path of the .nupkg.
     :raises SpawnError: when reading the version or packing fails.
     """
-    res = run(["dotnet", "msbuild", PROJECT, "-getProperty:Version"], capture_output=True)
+    major_property = f"-p:UmbracoMajor={major}"
+    res = run(["dotnet", "msbuild", PROJECT, "-getProperty:Version", major_property], capture_output=True)
     if res.returncode:
         raise SpawnError(f"Reading the package version failed:\n{(res.stdout + res.stderr).strip()[-2000:]}")
     base = res.stdout.strip()
-    # SemVer: add a pre-release label, or extend the existing one (1.0.0-beta.2 -> 1.0.0-beta.2.smoke.<ts>).
+    # SemVer: add a pre-release label, or extend the existing one (17.0.0-dev -> 17.0.0-dev.smoke.<ts>).
     version = f"{base}{'.' if '-' in base else '-'}smoke.{time.strftime('%Y%m%d%H%M%S')}"
 
     say(f"Packing {version} (builds the client too)")
     log = out_dir / "pack.log"
     with open(log, "wb") as f:
-        code = run(["dotnet", "pack", PROJECT, "-c", "Release", "-o", out_dir, f"-p:Version={version}", "-nologo"],
-                   stdout=f, stderr=f).returncode
+        code = run(["dotnet", "pack", PROJECT, "-c", "Release", "-o", out_dir, f"-p:Version={version}", major_property,
+                    "-nologo"], stdout=f, stderr=f).returncode
     if code:
         tail = "\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-30:])
         raise SpawnError(f"dotnet pack failed (full log: {log})\n{tail}")
@@ -127,8 +131,8 @@ def check_site(site, nupkg_version, mode):
     """
     api = site.admin_session()
 
-    # The site really runs the Umbraco version it was spawned with (the package's [17.0.0, 18.0.0)
-    # range must not have pulled in a newer Umbraco).
+    # The site really runs the Umbraco version it was spawned with (the package's range, such as
+    # [17.0.0, 18.0.0), must not have pulled in a newer Umbraco).
     info = api.json("GET", "/server/information")
     check(str(info.get("version", "")).startswith(site.umbraco_version),
           f"site runs Umbraco {info.get('version')}, expected {site.umbraco_version}")
@@ -210,11 +214,17 @@ def main():
     utf8_stdio()
     p = argparse.ArgumentParser(prog="smoke-package.py", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--umbraco", action="append", help="Umbraco version to test on (repeatable; default 17.0.0 and 17)")
+    p.add_argument("--major", type=int, choices=(17, 18), default=17,
+                   help="Umbraco major to pack the package for and test on (default 17)")
+    p.add_argument("--umbraco", action="append",
+                   help="Umbraco version to test on (repeatable; default <major>.0.0 and <major>, the newest release)")
     p.add_argument("--package", type=Path, help="Test this .nupkg instead of packing the working tree")
     p.add_argument("--keep", action="store_true", help="Keep the temp folder (sites stopped, logs intact)")
     a = p.parse_args()
-    versions = a.umbraco or ["17.0.0", "17"]
+    versions = a.umbraco or [f"{a.major}.0.0", str(a.major)]
+    wrong = [v for v in versions if v.split(".")[0] != str(a.major)]
+    if wrong:
+        die(f"--umbraco {', '.join(wrong)} is not Umbraco {a.major}; pass --major to test another major")
 
     root = Path(tempfile.mkdtemp(prefix="richdictionary-smoke-"))
     failed = []
@@ -226,7 +236,7 @@ def main():
             shutil.copy2(a.package, nupkg)  # its own folder, so the install source holds only this package
         else:
             (root / "packages").mkdir()
-            nupkg = pack(root / "packages")
+            nupkg = pack(root / "packages", a.major)
         package_id, version = read_nuspec(nupkg)
 
         for umbraco in versions:
