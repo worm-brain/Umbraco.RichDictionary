@@ -1,12 +1,18 @@
 {
   "$schema": "https://marketplace.umbraco.com/umbraco-marketplace-schema.json",
+  "Title": "Umbraco Rich Dictionary",
+  "Description": "Edit Umbraco dictionary values with a rich text (Tiptap) or Markdown editor instead of a plain textarea. The package drops into Umbraco's own Translation section: install it and every dictionary item opens in Umbraco's rich text editor, with no configuration and no change to where values are stored. Format copy without writing HTML by hand, render it on the site with one helper call, or switch the whole site to Markdown.",
   "Category": "Translations",
   "AlternateCategory": "Editor Tools",
   "PackageType": "Package",
   "LicenseTypes": ["Free"],
-  "DocumentationUrl": "https://github.com/worm-brain/Umbraco.RichDictionary#readme",
-  "IssueTrackerUrl": "https://github.com/worm-brain/Umbraco.RichDictionary/issues",
   "Tags": ["dictionary", "translation", "rich text", "tiptap", "markdown"],
+  "DocumentationUrl": "https://github.com/worm-brain/Umbraco.RichDictionary/blob/main/docs/index.md",
+  "IssueTrackerUrl": "https://github.com/worm-brain/Umbraco.RichDictionary/issues",
+  "AuthorDetails": {
+    "Name": "Jack Stunell",
+    "SyncContributorsFromRepository": true
+  },
   "Screenshots": [
     {
       "ImageUrl": "https://raw.githubusercontent.com/worm-brain/Umbraco.RichDictionary/main/docs/images/editor-rte.png",
