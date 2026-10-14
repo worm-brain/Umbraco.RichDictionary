@@ -1,0 +1,20 @@
+<Project>
+  <!--
+    Replaces Build for a sample site whose Umbraco major is not the one being built (imported by
+    samples/Directory.Build.targets, after the SDK's own Build, so this definition wins).
+    - In a solution build the site is skipped, so `dotnet build` builds Site17 and
+      `dotnet build -p:UmbracoMajor=18` builds Site18.
+    - Built or run on its own (for example `dotnet run` on Site18 without the property), it fails
+      with the command to use instead.
+  -->
+  <Target Name="Build">
+    <Error
+      Condition="'$(BuildingSolutionFile)' != 'true'"
+      Text="$(MSBuildProjectName) runs on Umbraco $(SampleUmbracoMajor), but this build targets Umbraco $(UmbracoMajor). Build or run it with -p:UmbracoMajor=$(SampleUmbracoMajor)."
+    />
+    <Message
+      Importance="high"
+      Text="Skipping $(MSBuildProjectName): it runs on Umbraco $(SampleUmbracoMajor) (build with -p:UmbracoMajor=$(SampleUmbracoMajor))."
+    />
+  </Target>
+</Project>

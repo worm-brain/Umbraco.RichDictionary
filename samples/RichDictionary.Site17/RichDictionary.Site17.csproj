@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Umbraco 17 sample site for developing and testing the package. Not packed. -->
+  <PropertyGroup>
+    <!-- The only Umbraco major this site builds for (samples/Directory.Build.targets). -->
+    <SampleUmbracoMajor>17</SampleUmbracoMajor>
+    <!-- Disable compression: the backoffice files are precompressed and dotnet must not handle them. -->
+    <CompressionEnabled>false</CompressionEnabled>
+    <!-- Sample code is not shipped, so it does not need XML docs. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      SixLabors.ImageSharp 3.1.12 comes in through Umbraco.Cms and is flagged by these advisories
+      (published 2026-10-07; fixed only in 4.1.2, which Umbraco 17 does not build against). The
+      sample site is not shipped, and the package itself does not reference ImageSharp. Remove
+      these once Umbraco ships a patched ImageSharp.
+    -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-gwg2-r3hj-4w44" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-j3p4-wp97-rph4" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-j9gm-c75j-xc9q" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-jjfr-hcj7-qf5w" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-wmxv-xphr-5c9g" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Cms" />
+    <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Patched versions of packages Umbraco brings in transitively, which the NuGet audit flags as
+      vulnerable (and warnings are errors). Remove these once Umbraco ships them.
+    -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" />
+    <RuntimeHostConfigurationOption
+      Include="System.Globalization.AppLocalIcu"
+      Value="72.1.0.3"
+      Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))"
+    />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Umbraco.Community.RichDictionary\Umbraco.Community.RichDictionary.csproj" />
+  </ItemGroup>
+
+  <!-- A project reference gets none of the package's buildTransitive files, so import the one that adds its appsettings schema. -->
+  <Import Project="..\..\src\Umbraco.Community.RichDictionary\buildTransitive\Umbraco.Community.RichDictionary.targets" />
+
+  <PropertyGroup>
+    <!-- Razor files are needed for the backoffice to work correctly -->
+    <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Remove RazorCompileOnBuild and RazorCompileOnPublish when not using ModelsMode InMemoryAuto -->
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+  </PropertyGroup>
+</Project>

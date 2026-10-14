@@ -1,0 +1,12 @@
+<Project>
+  <!--
+    Each sample site belongs to one Umbraco major ($(SampleUmbracoMajor), set in its csproj) and is
+    only built for that major, so a plain `dotnet build` never produces a site that refuses to start,
+    and a site's database is never opened by the wrong Umbraco. For any other major (UmbracoMajor in
+    Directory.Build.props), WrongUmbracoMajor.targets replaces the site's Build target.
+  -->
+  <Import
+    Project="WrongUmbracoMajor.targets"
+    Condition="'$(SampleUmbracoMajor)' != '' and '$(SampleUmbracoMajor)' != '$(UmbracoMajor)'"
+  />
+</Project>
