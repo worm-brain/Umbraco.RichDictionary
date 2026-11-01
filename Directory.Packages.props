@@ -14,7 +14,7 @@
   -->
   <PropertyGroup Condition="'$(UmbracoMajor)' == '17'">
     <UmbracoPackageRange>[17.0.0, 18.0.0)</UmbracoPackageRange>
-    <UmbracoDevVersion>17.7.1</UmbracoDevVersion>
+    <UmbracoDevVersion>17.8.0</UmbracoDevVersion>
     <MarkdigFloor>0.41.0</MarkdigFloor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(UmbracoMajor)' == '18'">
@@ -49,8 +49,8 @@
       Patched versions of packages Umbraco brings in transitively, for the test and sample projects
       only (the package itself audits direct references only). Remove these once Umbraco ships them.
     -->
-    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.13" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.14" />
   </ItemGroup>
 
   <ItemGroup Label="Testing">

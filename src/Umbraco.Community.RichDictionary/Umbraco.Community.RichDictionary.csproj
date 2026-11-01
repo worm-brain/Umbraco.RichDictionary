@@ -44,6 +44,8 @@
 
   <ItemGroup>
     <!-- Versions in Directory.Packages.props: Umbraco at the major's range (UmbracoPackageRange), Markdig at its 0.41.0 floor. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" VersionOverride="10.0.14" />
+    <PackageReference Include="System.Security.Cryptography.Xml" VersionOverride="10.0.14" />
     <PackageReference Include="Umbraco.Cms.Web.Website" />
     <PackageReference Include="Umbraco.Cms.Api.Management" />
     <PackageReference Include="Markdig" />
